@@ -1,7 +1,6 @@
 package dev.jazzybyte.lite.gateway.handler
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.SpringBootConfiguration
@@ -25,19 +24,15 @@ class FilterHandlerTest {
 
     @Test
     fun `test filter handler initialization`() {
-
         // given
         val exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/api/users").build())
 
         // when
-        filterHandler.handle(exchange)
-            // then
-            // 정상적으로 실행됐는지 확인한다.
-            .doOnSuccess {
-                log.info { "Filter handler executed successfully." }
-            }
-            .subscribe()
+        val result = filterHandler.handle(exchange)
+            .doOnSuccess { log.info { "Filter handler executed successfully." } }
 
+        // then
+        result.block()
     }
 
 
@@ -45,8 +40,6 @@ class FilterHandlerTest {
     @SpringBootConfiguration
     class TestConfig {
         @Bean
-        fun filterHandler(): FilterHandler {
-            return FilterHandler()
-        }
+        fun filterHandler() = FilterHandler()
     }
 }
