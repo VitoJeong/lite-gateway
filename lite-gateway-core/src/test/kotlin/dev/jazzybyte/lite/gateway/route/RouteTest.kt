@@ -3,6 +3,7 @@ package dev.jazzybyte.lite.gateway.route
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.springframework.web.server.ServerWebExchange
 
 class RouteTest {
 
@@ -10,6 +11,11 @@ class RouteTest {
  fun `default HTTP port`() {
   val route = Route.builder()
    .id("1")
+   .predicate(object : RoutePredicate {
+    override fun matches(exchange: ServerWebExchange): Boolean {
+     return true
+    }
+   })
    .predicate { true }
    .uri("http://test.com")
    .build()
@@ -39,7 +45,7 @@ class RouteTest {
  fun `full Uri`() {
   val route: Route = Route.builder()
    .id("1")
-   .predicate { exchange -> true }
+   .predicate { true }
    .uri("http://test.com:8080")
    .build()
 

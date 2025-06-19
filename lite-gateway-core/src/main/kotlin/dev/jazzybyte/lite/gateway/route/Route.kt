@@ -1,25 +1,25 @@
 package dev.jazzybyte.lite.gateway.route
 
-import org.springframework.web.server.ServerWebExchange
 import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
 import java.util.function.Predicate
 
 /**
- * Represents a route in the gateway.
+ * 정의된 라우팅 정보
  *
  * @property id The unique identifier for the route.
  * @property uri The URI to which the route points.
  */
-class Route(val id: String, val predicate: Predicate<ServerWebExchange>, val uri: URI) {
+class Route(val id: String, val predicates: List<RoutePredicate>, val uri: URI) {
 
     class Builder {
         private lateinit var id: String
-        private lateinit var predicate: Predicate<ServerWebExchange>
+        private var predicates: MutableList<RoutePredicate> = mutableListOf()
         private lateinit var uri: URI
 
         fun id(id: String) = apply { this.id = id }
-        fun predicate(predicate: Predicate<ServerWebExchange>) = apply { this.predicate = predicate }
+        fun predicate(predicate: RoutePredicate) = apply { this.predicates.add(predicate) }
+        fun predicates(predicates: List<RoutePredicate>) = apply { this.predicates.addAll(predicates) }
         fun uri(uri: String) = uri(URI.create(uri))
 
         fun uri(uri: URI): Builder {
@@ -41,8 +41,9 @@ class Route(val id: String, val predicate: Predicate<ServerWebExchange>, val uri
         }
 
         fun build(): Route {
-            return Route(id, predicate, uri)
+            return Route(id, predicates, uri)
         }
+
     }
 
     companion object {
