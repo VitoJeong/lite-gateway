@@ -4,6 +4,12 @@ import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
+/**
+ * 메모리 내에서 라우트를 관리하는 RouteLocator 구현체
+ * 주어진 라우트 목록을 기반으로 요청에 맞는 라우트를 찾아 반환합니다.
+ *
+ * 라우팅 설정들은 시스템이 실행될때 빈으로 등록되고 변경되지 않아, Flux가 아닌 List<Route>를 사용한다.
+ */
 class InMemoryRouteLocator(
     private val routes: List<Route>,
 ) : RouteLocator {

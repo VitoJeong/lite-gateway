@@ -70,4 +70,27 @@ class Route(
     companion object {
         fun builder() = Builder()
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Route
+
+        if (_order != other._order) return false
+        if (_id != other._id) return false
+        if (_predicates != other._predicates) return false
+        if (_uri != other._uri) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = _order
+        result = 31 * result + _id.hashCode()
+        result = 31 * result + _predicates.hashCode()
+        result = 31 * result + _uri.hashCode()
+        return result
+    }
+
 }
