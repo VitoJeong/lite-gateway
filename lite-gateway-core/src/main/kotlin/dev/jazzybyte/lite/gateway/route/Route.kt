@@ -1,8 +1,8 @@
 package dev.jazzybyte.lite.gateway.route
 
+import org.springframework.core.Ordered
 import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
-import java.util.function.Predicate
 
 /**
  * 정의된 라우팅 정보
@@ -10,17 +10,38 @@ import java.util.function.Predicate
  * @property id The unique identifier for the route.
  * @property uri The URI to which the route points.
  */
-class Route(val id: String, val predicates: List<RoutePredicate>, val uri: URI) {
+class Route(
+    private val _id: String,
+    private val _predicates: List<RoutePredicate>,
+    private val _uri: URI,
+    // 라우트의 우선순위, 정수 값이 낮을수록 먼저 처리됨
+    private val _order: Int = Ordered.LOWEST_PRECEDENCE,
+) {
+
+    // 라우트의 고유 식별자
+    val id: String get() = _id
+
+    // 라우트에 정의된 조건 목록
+    val predicates: List<RoutePredicate> get() = _predicates
+
+    // 라우트가 가리키는 URI
+    val uri: URI get() = _uri
+
+    // 라우트의 우선순위
+    val order: Int get() = _order
+
 
     class Builder {
         private lateinit var id: String
         private var predicates: MutableList<RoutePredicate> = mutableListOf()
         private lateinit var uri: URI
+        private var order: Int = Ordered.LOWEST_PRECEDENCE
 
         fun id(id: String) = apply { this.id = id }
         fun predicate(predicate: RoutePredicate) = apply { this.predicates.add(predicate) }
         fun predicates(predicates: List<RoutePredicate>) = apply { this.predicates.addAll(predicates) }
         fun uri(uri: String) = uri(URI.create(uri))
+        fun order(order: Int) = apply { this.order = order }
 
         fun uri(uri: URI): Builder {
             this.uri = uri
@@ -41,7 +62,7 @@ class Route(val id: String, val predicates: List<RoutePredicate>, val uri: URI) 
         }
 
         fun build(): Route {
-            return Route(id, predicates, uri)
+            return Route(id, predicates, uri, order)
         }
 
     }
