@@ -1,0 +1,51 @@
+package dev.jazzybyte.lite.gateway.handler
+
+import dev.jazzybyte.lite.gateway.route.Route
+import dev.jazzybyte.lite.gateway.route.RouteLocator
+import io.mockk.every
+import io.mockk.mockk
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Test
+import org.springframework.mock.http.server.reactive.MockServerHttpRequest
+import org.springframework.mock.web.server.MockServerWebExchange
+import org.springframework.web.server.ServerWebExchange
+import reactor.core.publisher.Mono
+
+class GatewayHandlerMappingTest {
+
+
+    var locator: RouteLocator = mockk<RouteLocator>()
+    var handler: FilterHandler = mockk<FilterHandler>()
+
+    // GatewayHandlerMapping 클래스의 익명 객체를 생성하여 테스트 구현
+    // -> getHandlerInternal 메서드를 테스트하기 위한 목적으로 사용
+    private val gatewayHandlerMapping = object : GatewayHandlerMapping(locator, handler) {
+        fun testGetHandlerInternal(exchange: ServerWebExchange): Mono<FilterHandler> {
+            return getHandlerInternal(exchange)
+        }
+    }
+
+    @Test
+    fun `get handler internal`() {
+
+        // given
+        val route = Route.builder()
+            .id("test-route")
+            .predicate { it.request.uri.path.startsWith("/v1") }
+            .uri("https://test.com")
+            .build()
+
+        val exchange = MockServerWebExchange.from(
+            MockServerHttpRequest.get("/v1/test").build()
+        )
+
+        every { locator.locate(exchange) } returns Mono.just(route)
+
+        // when
+        val handler = gatewayHandlerMapping.testGetHandlerInternal(exchange).block()
+
+        // then
+        assertNotNull(handler, "Handler should not be null")
+    }
+
+}
