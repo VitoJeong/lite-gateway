@@ -26,11 +26,11 @@ class GatewayHandlerMappingTest {
     fun `get handler internal`() {
 
         // given
-        val route = Route.builder()
-            .id("test-route")
-            .predicate { it.request.uri.path.startsWith("/v1") }
-            .uri("https://test.com")
-            .build()
+        val route = Route(
+            id = "test-route",
+            uri = "https://test.com",
+            predicate = { it.request.uri.path.startsWith("/v1") }
+        )
 
         val exchange = MockServerWebExchange.from(
             MockServerHttpRequest.get("/v1/test").build()

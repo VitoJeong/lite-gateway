@@ -11,17 +11,17 @@ class InMemoryRouteLocatorTest {
 
     @Test
     fun `should match multiple routes`() {
-        val route1 = Route.builder()
-            .id("r1")
-            .predicate(RoutePredicate { it.request.uri.path.startsWith("/api") })
-            .uri("http://api-1.dev")
-            .build()
+        val route1 = Route(
+            id = "r1",
+            predicate = RoutePredicate { it.request.uri.path.startsWith("/api") },
+            uri = "http://api-1.dev"
+        )
 
-        val route2 = Route.builder()
-            .id("r2")
-            .predicate(RoutePredicate { it.request.uri.path.contains("users") })
-            .uri("http://api-1.dev")
-            .build()
+        val route2 = Route(
+            id = "r2",
+            predicate = RoutePredicate { it.request.uri.path.contains("users") },
+            uri = "http://api-1.dev"
+        )
         val locator = InMemoryRouteLocator(listOf(route1, route2))
         val exchange = MockServerWebExchange.from(MockServerHttpRequest.get("http://api-1.dev/api/users").build())
 
@@ -33,11 +33,12 @@ class InMemoryRouteLocatorTest {
 
     @Test
     fun `should return null if no route matches`() {
-        val route = Route.builder()
-            .id("no-match")
-            .predicate { ex -> ex.request.uri.path.startsWith("/admin") }
-            .uri("http://admin")
-            .build()
+        val route = Route(
+            id = "no-match",
+            predicate = { it -> it.request.uri.path.startsWith("/admin") },
+            uri = "http://admin"
+        )
+
         val locator = InMemoryRouteLocator(listOf(route))
         val exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/user").build())
 
