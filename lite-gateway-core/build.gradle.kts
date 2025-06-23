@@ -52,10 +52,17 @@ dependencies {
     testImplementation("com.appmattus.fixture:fixture:1.2.0")
     // MockK (mocking 도구)
     testImplementation("io.mockk:mockk:1.13.17")
-
     // Kotlin reflection (Fixture 내부에서 필요할 수 있음)
     testImplementation("org.jetbrains.kotlin:kotlin-reflect")
 
+    // MacOS Apple silicon 네이티브 DNS 리졸버 의존성
+    val isMacOS = System.getProperty("os.name").toLowerCase().contains("mac")
+    val isAarch64 = System.getProperty("os.arch").toLowerCase().contains("aarch64")
+
+    if (isMacOS && isAarch64) {
+        runtimeOnly("io.netty:netty-resolver-dns-native-macos:4.1.107.Final:osx-aarch_64")
+        testRuntimeOnly("io.netty:netty-resolver-dns-native-macos:4.1.107.Final:osx-aarch_64")
+    }
 }
 
 sourceSets {
