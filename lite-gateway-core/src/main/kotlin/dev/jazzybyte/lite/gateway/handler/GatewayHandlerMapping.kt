@@ -20,15 +20,23 @@ class GatewayHandlerMapping(
     private val filterHandler: FilterHandler,
 ) : AbstractHandlerMapping() {
 
+    init {
+        order = 0 // 핸들러 매핑의 우선순위를 설정합니다. 낮을수록 우선순위가 높습니다.
+    }
+
     /**
      * 요청에 맞는 핸들러를 반환합니다.
      */
-    override fun getHandlerInternal(exchange: ServerWebExchange): Mono<FilterHandler> =
-        resolveHandler(exchange)
+    override fun getHandlerInternal(exchange: ServerWebExchange): Mono<FilterHandler> = resolveHandler(exchange)
 
     internal fun resolveHandler(exchange: ServerWebExchange): Mono<FilterHandler> {
+        log.info { "Resolving handler for request: ${exchange.request.path}" }
+
         return routeLocator.locate(exchange)
-            .doOnNext { exchange.attributes["matchedRoute"] = it }
+            .doOnNext {
+                log.info { "Matched route: ${it.id} for request: ${exchange.request.path}" }
+                exchange.attributes["matchedRoute"] = it
+            }
             .thenReturn(filterHandler)
             .switchIfEmpty(Mono.error(IllegalArgumentException("No matching route found for ${exchange.request.path}")))
     }

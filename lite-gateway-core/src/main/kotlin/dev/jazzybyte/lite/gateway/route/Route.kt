@@ -55,6 +55,13 @@ class Route(
         order: Int = Ordered.LOWEST_PRECEDENCE
     ) : this(id, listOf(predicate), URI.create(uri), order)
 
+    constructor(
+        id: String,
+        uri: String,
+        order: Int = Ordered.LOWEST_PRECEDENCE,
+        predicates: List<RoutePredicate>,
+    ) : this(id, predicates, URI.create(uri), order)
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

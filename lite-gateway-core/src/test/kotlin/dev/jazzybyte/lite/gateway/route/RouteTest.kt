@@ -37,7 +37,7 @@ class RouteTest {
 
     @Test
     fun `full Uri`() {
-        val route: Route = Route(
+        val route = Route(
             id = "1",
             uri = "http://test.com:8080",
             predicate = { true }
