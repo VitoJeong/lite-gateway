@@ -1,3 +1,5 @@
+import java.util.*
+
 plugins {
     kotlin("jvm") version "2.1.21"
     kotlin("plugin.spring") version "2.1.21"
@@ -54,10 +56,11 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.17")
     // Kotlin reflection (Fixture 내부에서 필요할 수 있음)
     testImplementation("org.jetbrains.kotlin:kotlin-reflect")
+    testImplementation("org.wiremock:wiremock-standalone:3.9.1")
 
     // MacOS Apple silicon 네이티브 DNS 리졸버 의존성
-    val isMacOS = System.getProperty("os.name").toLowerCase().contains("mac")
-    val isAarch64 = System.getProperty("os.arch").toLowerCase().contains("aarch64")
+    val isMacOS = System.getProperty("os.name").lowercase().contains("mac")
+    val isAarch64 = System.getProperty("os.arch").lowercase().contains("aarch64")
 
     if (isMacOS && isAarch64) {
         runtimeOnly("io.netty:netty-resolver-dns-native-macos:4.1.107.Final:osx-aarch_64")
