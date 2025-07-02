@@ -24,6 +24,10 @@ class GatewayHandlerMapping(
         order = 0 // 핸들러 매핑의 우선순위를 설정합니다. 낮을수록 우선순위가 높습니다.
     }
 
+    companion object {
+        const val MATCHED_ROUTE_ATTRIBUTE = "matchedRoute"
+    }
+
     /**
      * 요청에 맞는 핸들러를 반환합니다.
      */
@@ -35,7 +39,7 @@ class GatewayHandlerMapping(
         return routeLocator.locate(exchange)
             .doOnNext {
                 log.info { "Matched route: ${it.id} for request: ${exchange.request.path}" }
-                exchange.attributes["matchedRoute"] = it
+                exchange.attributes[MATCHED_ROUTE_ATTRIBUTE] = it
             }
             .thenReturn(filterHandler)
             .switchIfEmpty(Mono.error(IllegalArgumentException("No matching route found for ${exchange.request.path}")))
