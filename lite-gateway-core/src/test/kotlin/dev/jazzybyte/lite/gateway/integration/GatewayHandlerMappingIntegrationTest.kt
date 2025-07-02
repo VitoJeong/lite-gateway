@@ -20,25 +20,18 @@ import dev.jazzybyte.lite.gateway.route.InMemoryRouteLocator
 import dev.jazzybyte.lite.gateway.route.PathPredicate
 import dev.jazzybyte.lite.gateway.route.Route
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.SpringBootConfiguration
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
-import org.springframework.context.ApplicationContext
-import org.springframework.context.ApplicationContextInitializer
-import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.annotation.Bean
-import org.springframework.core.env.ConfigurableEnvironment
-import org.springframework.core.env.MapPropertySource
 import org.springframework.http.client.reactive.ClientHttpConnector
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.test.annotation.DirtiesContext
-import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.expectBody
 import org.springframework.web.util.DefaultUriBuilderFactory
@@ -47,15 +40,11 @@ import org.springframework.web.util.DefaultUriBuilderFactory
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     classes = [GatewayHandlerMappingIntegrationTest.TestConfig::class],
 )
-@ContextConfiguration(initializers = [GatewayHandlerMappingIntegrationTest.RouteInitializer::class])
 @DirtiesContext
 class GatewayHandlerMappingIntegrationTest {
 
     // 로거
     private val log = KotlinLogging.logger {}
-
-    @Autowired
-    lateinit var applicationContext: ApplicationContext
 
     @LocalServerPort
     val port: Int = 0
@@ -70,17 +59,42 @@ class GatewayHandlerMappingIntegrationTest {
      */
     lateinit var baseUri: String
 
+    companion object {
+        private lateinit var wireMockServer: WireMockServer
+
+        // BeforeAll
+        @BeforeAll
+        @JvmStatic
+        fun beforeAll() {
+            wireMockServer = WireMockServer(WireMockConfiguration.options().dynamicPort())
+            wireMockServer.start()
+
+            val requests = wireMockServer.allServeEvents
+            requests.forEach {
+                println("Received: ${it.request.method} ${it.request.url}")
+            }
+            val unmatched = wireMockServer.findUnmatchedRequests()
+            unmatched.requests.forEach {
+                println("Unmatched request: ${it.method} ${it.url}")
+            }
+
+        }
+
+        @AfterAll
+        @JvmStatic
+        fun afterAll() {
+            wireMockServer.stop()
+            wireMockServer.shutdown()
+        }
+    }
 
     @BeforeEach
     fun setup() {
-        configureFor("localhost", RouteInitializer.wireMockServer.port())
+        wireMockServer.resetAll()
+        configureFor("localhost", wireMockServer.port())
 
         setup(ReactorClientHttpConnector(), "http://localhost:$port")
-    }
 
-    @AfterEach
-    fun teardown() {
-        RouteInitializer.wireMockServer.stop()
     }
 
     protected fun setup(httpConnector: ClientHttpConnector?, baseUri: String) {
@@ -175,9 +189,6 @@ class GatewayHandlerMappingIntegrationTest {
     @SpringBootConfiguration
     class TestConfig {
 
-        @Value("\${wiremock.port}")
-        var mockPort: Int = 0
-
         @Bean
         fun inMemoryRouteLocator(): InMemoryRouteLocator {
             return InMemoryRouteLocator(
@@ -185,7 +196,7 @@ class GatewayHandlerMappingIntegrationTest {
                     Route(
                         id = "test-route",
                         order = 0,
-                        uri = "http://localhost:$mockPort",
+                        uri = wireMockServer.baseUrl(),
                         predicates = listOf(PathPredicate("/api/*"))
                     )
                 )
@@ -203,33 +214,6 @@ class GatewayHandlerMappingIntegrationTest {
             return GatewayHandlerMapping(inMemoryRouteLocator, filterHandler)
         }
 
-    }
-
-    class RouteInitializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
-
-        companion object {
-            lateinit var wireMockServer: WireMockServer
-                private set
-        }
-
-        override fun initialize(context: ConfigurableApplicationContext) {
-            wireMockServer = WireMockServer(WireMockConfiguration.options().dynamicPort())
-            wireMockServer.start()
-
-            val requests = wireMockServer.allServeEvents
-            requests.forEach {
-                println("Received: ${it.request.method} ${it.request.url}")
-            }
-            val unmatched = wireMockServer.findUnmatchedRequests()
-            unmatched.requests.forEach {
-                println("Unmatched request: ${it.method} ${it.url}")
-            }
-
-            val env = context.environment as ConfigurableEnvironment
-            val props = mapOf("wiremock.port" to wireMockServer.port().toString())
-            val propertySource = MapPropertySource("wiremock", props)
-            env.propertySources.addFirst(propertySource)
-        }
     }
 
 
