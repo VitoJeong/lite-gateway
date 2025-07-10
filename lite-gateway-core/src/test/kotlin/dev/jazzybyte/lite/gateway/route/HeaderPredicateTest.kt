@@ -44,13 +44,25 @@ class HeaderPredicateTest {
     }
 
     @Test
+    fun `matches when header exists without value`() {
+        val serverWebExchange = MockServerWebExchange.from(
+            MockServerHttpRequest.get("https://test.com")
+                .header("X-Test-Header", "value1")
+        )
+
+        HeaderPredicate("X-Test-Header").matches(
+            serverWebExchange
+        ).also { assertTrue(it) }
+    }
+
+    @Test
     fun `matches when header value matches pattern`() {
         val serverWebExchange = MockServerWebExchange.from(
             MockServerHttpRequest.post("https://test.com")
                 .header("X-Test-Header", "value123")
         )
 
-        HeaderPredicate("X-Test-Header,value\\d+").matches(
+        HeaderPredicate("X-Test-Header, value\\d+").matches(
             serverWebExchange
         ).also { assertTrue(it) }
     }

@@ -1,18 +1,19 @@
 package dev.jazzybyte.lite.gateway.route;
 
+import org.springframework.util.StringUtils
 import org.springframework.web.server.ServerWebExchange
 
 class HeaderPredicate (
-    pattern: String
+    text: String
 ): RoutePredicate {
 
     private val name: String
     private val value: String?
 
     init {
-        val parts = pattern.split(",")
-        this.name = parts.getOrElse(0) { throw IllegalArgumentException("Header name must not be empty.") }
-        this.value = parts.getOrElse(1) { null }
+        val args = StringUtils.tokenizeToStringArray(text, ",")
+        this.name = args.getOrElse(0) { throw IllegalArgumentException("Header name must not be empty.") }
+        this.value = args.getOrElse(1) { null }
     }
 
     override fun matches(exchange: ServerWebExchange): Boolean {
