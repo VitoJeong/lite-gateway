@@ -16,6 +16,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.verify
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import dev.jazzybyte.lite.gateway.handler.FilterHandler
 import dev.jazzybyte.lite.gateway.handler.GatewayHandlerMapping
+import dev.jazzybyte.lite.gateway.route.HostPredicate
 import dev.jazzybyte.lite.gateway.route.InMemoryRouteLocator
 import dev.jazzybyte.lite.gateway.route.PathPredicate
 import dev.jazzybyte.lite.gateway.route.Route
@@ -197,7 +198,7 @@ class GatewayHandlerMappingIntegrationTest {
                         id = "test-route",
                         order = 0,
                         uri = wireMockServer.baseUrl(),
-                        predicates = listOf(PathPredicate("/api/*"))
+                        predicates = listOf(PathPredicate("/api/*"), HostPredicate("*"))
                     )
                 )
             )
