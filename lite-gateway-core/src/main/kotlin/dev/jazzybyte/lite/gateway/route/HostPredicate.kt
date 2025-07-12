@@ -7,8 +7,7 @@ class HostPredicate (
     private val pattern: String
 ) : RoutePredicate {
 
-    val matcher: AntPathMatcher = AntPathMatcher(".")
-
+    private val matcher: AntPathMatcher = AntPathMatcher(".")
 
     override fun matches(exchange: ServerWebExchange): Boolean {
         // 요청의 호스트가 지정된 호스트와 일치하는지 확인

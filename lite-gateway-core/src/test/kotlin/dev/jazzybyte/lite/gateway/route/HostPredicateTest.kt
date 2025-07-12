@@ -41,5 +41,4 @@ class HostPredicateTest {
         ).also { assertTrue(it) }
     }
 
-
 }
