@@ -4,6 +4,9 @@ plugins {
     kotlin("jvm") version "2.1.21"
     kotlin("plugin.spring") version "2.1.21"
     kotlin("plugin.serialization") version "2.1.21" // Kotlinx Serialization 플러그인 추가
+    // 코틀린에서 annotation processor를 실행하기 위한 플러그인
+    // -> 동으로 annotation processor를 실행하고, 생성된 코드를 컴파일할 수 있다.
+    kotlin("kapt") version "2.1.21"
 
     id("org.springframework.boot") version "3.3.12"
     id("io.spring.dependency-management") version "1.1.7"
@@ -33,7 +36,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     // Kotlinx Serialization 의존성 추가(Jackson 대체)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
-
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
@@ -43,7 +45,7 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-core:2.20.0")
     implementation("org.apache.logging.log4j:log4j-slf4j2-impl:2.20.0")
 
-    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    kapt("org.springframework.boot:spring-boot-configuration-processor")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")

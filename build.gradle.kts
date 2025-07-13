@@ -2,6 +2,9 @@ plugins {
 	kotlin("jvm") version "2.1.21"
 	kotlin("plugin.spring") version "2.1.21"
 	kotlin("plugin.serialization") version "2.1.21" // Kotlinx Serialization 플러그인 추가
+	// 코틀린에서 annotation processor를 실행하기 위한 플러그인
+	// -> 동으로 annotation processor를 실행하고, 생성된 코드를 컴파일할 수 있다.
+	kotlin("kapt") version "2.1.21"
 
 	id("org.springframework.boot") version "3.3.12"
 	id("io.spring.dependency-management") version "1.1.7"
@@ -44,7 +47,7 @@ dependencies {
 	implementation(project(":lite-gateway-spring-sdk"))
 	implementation(project(":lite-gateway-sample"))
 
-	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+	kapt("org.springframework.boot:spring-boot-configuration-processor")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("io.projectreactor:reactor-test")
