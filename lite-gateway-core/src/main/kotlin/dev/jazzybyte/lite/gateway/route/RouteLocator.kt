@@ -4,10 +4,7 @@ import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
-/**
- * 요청에 대한 라우팅 정보를 제공하는 인터페이스
- * 구현 클래스는 ServerWebExchange를 기반으로 라우트 목록을 반환해야 합니다.
- */
+
 interface RouteLocator {
 
     /**
