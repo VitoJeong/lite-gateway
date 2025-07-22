@@ -25,7 +25,6 @@ private val log = KotlinLogging.logger {}
 
 class FilterHandler : WebHandler {
 
-    private val log = KotlinLogging.logger {}
     private val webClient = WebClient.builder()
         .exchangeStrategies(
             ExchangeStrategies.builder()

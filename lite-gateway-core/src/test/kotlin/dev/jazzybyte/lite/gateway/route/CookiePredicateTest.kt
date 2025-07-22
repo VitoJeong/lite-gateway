@@ -16,7 +16,7 @@ class CookiePredicateTest {
                 .cookie(HttpCookie("X-Test-Cookie", "value1"))
         )
 
-        CookiePredicate(name = "X-Test-Cookie", "value\\d+").matches(
+        CookiePredicate(key = "X-Test-Cookie", pattern = "value\\d+").matches(
             serverWebExchange
         ).also { assertTrue(it) }
     }
@@ -28,7 +28,7 @@ class CookiePredicateTest {
                 .cookie(HttpCookie("X-Test-Cookie", "value1"))
         )
 
-        CookiePredicate(name = "X-Test-Cookie", null).matches(
+        CookiePredicate(key = "X-Test-Cookie", pattern = null).matches(
             serverWebExchange
         ).also { assertTrue(it) }
     }
@@ -40,7 +40,7 @@ class CookiePredicateTest {
                 .cookie(HttpCookie("X-Test-Cookie", "invalidValue"))
         )
 
-        CookiePredicate(name = "X-Test-Cookie", "value\\d+").matches(
+        CookiePredicate(key = "X-Test-Cookie", pattern = "value\\d+").matches(
             serverWebExchange
         ).also { assertFalse(it) }
     }

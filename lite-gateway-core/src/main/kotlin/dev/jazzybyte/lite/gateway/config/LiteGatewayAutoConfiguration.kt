@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.autoconfigure.web.reactive.HttpHandlerAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.WebFluxAutoConfiguration
 import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.reactive.DispatcherHandler
 
@@ -23,7 +24,12 @@ import org.springframework.web.reactive.DispatcherHandler
 @EnableConfigurationProperties(LiteGatewayConfigProperties::class)
 @AutoConfigureBefore(HttpHandlerAutoConfiguration::class, WebFluxAutoConfiguration::class)
 @ConditionalOnClass(DispatcherHandler::class)
-class LiteGatewayAutoConfiguration {
+class LiteGatewayAutoConfiguration(
+    private val properties: LiteGatewayConfigProperties
+) {
+
+    @Bean
+    fun routeLocator() = RouteLocatorFactory.create(properties.routes)
 
 
 }

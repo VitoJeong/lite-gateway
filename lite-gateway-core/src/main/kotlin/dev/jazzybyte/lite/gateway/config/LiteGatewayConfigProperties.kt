@@ -13,6 +13,7 @@ class LiteGatewayConfigProperties {
         const val PREFIX = "lite.gateway"
     }
 
+
     /**
      * 게이트웨이에 적용할 라우트 목록.
      */

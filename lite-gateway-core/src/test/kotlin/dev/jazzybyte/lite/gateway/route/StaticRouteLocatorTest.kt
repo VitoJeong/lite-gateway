@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest
 import org.springframework.mock.web.server.MockServerWebExchange
 
-class InMemoryRouteLocatorTest {
+class StaticRouteLocatorTest {
 
     @Test
     fun `should match multiple routes`() {
@@ -22,7 +22,7 @@ class InMemoryRouteLocatorTest {
             predicate = RoutePredicate { it.request.uri.path.contains("users") },
             uri = "http://api-1.dev"
         )
-        val locator = InMemoryRouteLocator(listOf(route1, route2))
+        val locator = StaticRouteLocator(listOf(route1, route2))
         val exchange = MockServerWebExchange.from(MockServerHttpRequest.get("http://api-1.dev/api/users").build())
 
         val matched = locator.locate(exchange).block()
@@ -39,7 +39,7 @@ class InMemoryRouteLocatorTest {
             uri = "http://admin"
         )
 
-        val locator = InMemoryRouteLocator(listOf(route))
+        val locator = StaticRouteLocator(listOf(route))
         val exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/user").build())
 
         assertTrue(locator.locate(exchange).blockOptional().isEmpty)

@@ -17,7 +17,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import dev.jazzybyte.lite.gateway.handler.FilterHandler
 import dev.jazzybyte.lite.gateway.handler.GatewayHandlerMapping
 import dev.jazzybyte.lite.gateway.route.HostPredicate
-import dev.jazzybyte.lite.gateway.route.InMemoryRouteLocator
+import dev.jazzybyte.lite.gateway.route.StaticRouteLocator
 import dev.jazzybyte.lite.gateway.route.PathPredicate
 import dev.jazzybyte.lite.gateway.route.Route
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -191,8 +191,8 @@ class GatewayHandlerMappingIntegrationTest {
     class TestConfig {
 
         @Bean
-        fun inMemoryRouteLocator(): InMemoryRouteLocator {
-            return InMemoryRouteLocator(
+        fun inMemoryRouteLocator(): StaticRouteLocator {
+            return StaticRouteLocator(
                 routes = listOf(
                     Route(
                         id = "test-route",
@@ -209,10 +209,10 @@ class GatewayHandlerMappingIntegrationTest {
 
         @Bean
         fun gatewayHandlerMapping(
-            inMemoryRouteLocator: InMemoryRouteLocator,
+            staticRouteLocator: StaticRouteLocator,
             filterHandler: FilterHandler,
         ): GatewayHandlerMapping {
-            return GatewayHandlerMapping(inMemoryRouteLocator, filterHandler)
+            return GatewayHandlerMapping(staticRouteLocator, filterHandler)
         }
 
     }

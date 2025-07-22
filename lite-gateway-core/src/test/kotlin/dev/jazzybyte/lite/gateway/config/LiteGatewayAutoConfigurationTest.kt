@@ -1,9 +1,14 @@
 package dev.jazzybyte.lite.gateway.config
 
+import dev.jazzybyte.lite.gateway.route.PathPredicate
+import dev.jazzybyte.lite.gateway.route.StaticRouteLocator
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.boot.autoconfigure.AutoConfigurations
 import org.springframework.boot.test.context.runner.ApplicationContextRunner
+import org.springframework.mock.http.server.reactive.MockServerHttpRequest
+import org.springframework.mock.web.server.MockServerWebExchange
+import kotlin.test.assertTrue
 
 /**
  * [LiteGatewayAutoConfiguration]에 대한 테스트 클래스.
@@ -64,7 +69,7 @@ class LiteGatewayAutoConfigurationTest {
                 "lite.gateway.routes[0].id=test-route",
                 "lite.gateway.routes[0].uri=http://example.com",
                 "lite.gateway.routes[0].predicates[0].name=Path",
-                "lite.gateway.routes[0].predicates[0].args.pattern=/test/**"
+                "lite.gateway.routes[0].predicates[0].args=/foo/**",
             )
             .run { context ->
                 // when: context is loaded
@@ -78,10 +83,21 @@ class LiteGatewayAutoConfigurationTest {
                 assertThat(route.id).isEqualTo("test-route")
                 assertThat(route.uri).isEqualTo("http://example.com")
 
-    //            assertThat(route.predicates).hasSize(1)
-    //            val predicate = route.predicates[0]
-    //            assertThat(predicate.name).isEqualTo("Path")
-    //            assertThat(predicate.args).containsEntry("pattern", "/test/**")
+
+                // and: verify that StaticRouteLocator is correctly registered
+                assertThat(context).hasSingleBean(StaticRouteLocator::class.java)
+                val routeLocator = context.getBean(StaticRouteLocator::class.java)
+                assertThat(routeLocator.routes).hasSize(1)
+                val registeredRoute = routeLocator.routes.first()
+                assertThat(registeredRoute.predicates).hasSize(1)
+                assertTrue { registeredRoute.predicates[0] is PathPredicate }
+                val pathPredicate = registeredRoute.predicates[0] as PathPredicate
+
+                val serverWebExchange = MockServerWebExchange.from(
+                    MockServerHttpRequest.get("http://test.com/foo/1")
+                )
+                assertTrue { pathPredicate.matches(serverWebExchange) }
+
             }
     }
 }
