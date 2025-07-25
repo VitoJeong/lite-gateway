@@ -69,3 +69,16 @@ kotlin {
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
+
+subprojects {
+	plugins.withId("org.springframework.boot") {
+		if (!project.name.contains("sample")) {
+			tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar").configure {
+				enabled = false
+			}
+			tasks.named<Jar>("jar").configure {
+				enabled = true
+			}
+		}
+	}
+}
