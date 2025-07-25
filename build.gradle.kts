@@ -58,6 +58,9 @@ dependencies {
 }
 
 kotlin {
+	jvmToolchain {
+		languageVersion.set(JavaLanguageVersion.of(17)) // 💡 여기
+	}
 	compilerOptions {
 		freeCompilerArgs.addAll("-Xjsr305=strict")
 	}
