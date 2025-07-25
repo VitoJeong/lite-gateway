@@ -4,8 +4,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class LiteGatewaySpringSdkApplication
+class LiteGatewayServerWebfluxApplication
 
 fun main(args: Array<String>) {
-    runApplication<LiteGatewaySpringSdkApplication>(*args)
+    runApplication<LiteGatewayServerWebfluxApplication>(*args)
 }

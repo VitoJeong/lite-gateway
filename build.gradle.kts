@@ -44,7 +44,7 @@ dependencies {
 	implementation(project(":lite-gateway-core"))
 	implementation(project(":lite-gateway-spring-boot-autoconfigure"))
 	implementation(project(":lite-gateway-spring-boot-starter"))
-	implementation(project(":lite-gateway-spring-sdk"))
+	implementation(project(":lite-gateway-server-webflux"))
 	implementation(project(":lite-gateway-sample"))
 
 	kapt("org.springframework.boot:spring-boot-configuration-processor")
