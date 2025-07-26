@@ -1,23 +1,23 @@
 package dev.jazzybyte.lite.gateway.util
 
-import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider
-import org.springframework.core.type.filter.AssignableTypeFilter
+import io.github.classgraph.ClassGraph
+import java.lang.reflect.Modifier
 
 
 class ReflectionUtil {
     companion object {
-        fun getClassesFromPackage(packageName: String): Set<Class<*>> {
-            val scanner = ClassPathScanningCandidateComponentProvider(false)
-            scanner.addIncludeFilter(AssignableTypeFilter(Any::class.java))
 
-            val candidates = scanner.findCandidateComponents(packageName)
-            return candidates
-                .mapNotNull { it.beanClassName }
-                .filterNot { className ->
-                    className.contains("test", ignoreCase = true) || className.contains("Test")
-                }
-                .map { Class.forName(it) }
-                .toSet()
+        @Suppress("UNCHECKED_CAST")
+        fun <T> findClassesOfType(packageName: String, type: Class<T>): List<Class<out T>> {
+            val scanResult = ClassGraph()
+                .enableClassInfo()
+                .acceptPackages(packageName)
+                .scan()
+
+            return scanResult.getClassesImplementing(type.name) // 또는 getSubclasses(type.name)
+                .loadClasses()
+                .filter { !it.isInterface && !Modifier.isAbstract(it.modifiers) }
+                .map { it as Class<out T> }
         }
 
         fun <T> createInstanceOfType(type: Class<T>): T {

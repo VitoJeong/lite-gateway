@@ -17,11 +17,9 @@ class RouteLocatorFactory {
     companion object {
 
         // Predicate 클래스들을 동적으로 로드하기 위한 맵(Predicate Prefix -> 클래스)
-        val predicateClasses: Map<String, Class<out RoutePredicate>> =
-            ReflectionUtil.getClassesFromPackage("dev.jazzybyte.lite.gateway.route")
-                .filter { it.simpleName.endsWith("Predicate") && RoutePredicate::class.java.isAssignableFrom(it) }
+        private val predicateClasses: Map<String, Class<out RoutePredicate>> =
+            ReflectionUtil.findClassesOfType("dev.jazzybyte.lite.gateway.route", RoutePredicate::class.java)
                 .associateBy { it.simpleName.removeSuffix("Predicate") }
-                .mapValues { (_, clazz) -> clazz as Class<out RoutePredicate> }
                 .also {
                     log.info { "Initializing predicate classes: $it" }
                 }
