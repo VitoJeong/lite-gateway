@@ -1,7 +1,7 @@
 package dev.jazzybyte.lite.gateway.route
 
+import dev.jazzybyte.lite.gateway.context.RequestContext
 import org.springframework.util.AntPathMatcher
-import org.springframework.web.server.ServerWebExchange
 
 
 class PathPredicate (
@@ -9,9 +9,9 @@ class PathPredicate (
 ): RoutePredicate {
 
     // 와일드카드 `*`를 지원하는 AntPathMatcher 사용
-    private val matcher: AntPathMatcher = AntPathMatcher()
+    private val matcher = AntPathMatcher()
 
-    override fun matches(exchange: ServerWebExchange): Boolean {
-        return matcher.match(pattern, exchange.request.path.value())
+    override fun matches(context: RequestContext): Boolean {
+        return matcher.match(pattern, context.path())
     }
 }

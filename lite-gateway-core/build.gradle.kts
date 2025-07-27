@@ -30,6 +30,7 @@ repositories {
 dependencies {
     // Kotlinx Serialization 의존성 추가(Jackson 대체)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.2.3")
 
     // 로깅 관련 의존성
     implementation("io.github.oshai:kotlin-logging-jvm:5.1.1")

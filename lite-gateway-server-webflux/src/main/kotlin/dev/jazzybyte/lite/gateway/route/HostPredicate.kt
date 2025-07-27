@@ -1,7 +1,7 @@
 package dev.jazzybyte.lite.gateway.route
 
+import dev.jazzybyte.lite.gateway.context.RequestContext
 import org.springframework.util.AntPathMatcher
-import org.springframework.web.server.ServerWebExchange
 
 class HostPredicate (
     private val pattern: String
@@ -9,9 +9,9 @@ class HostPredicate (
 
     private val matcher: AntPathMatcher = AntPathMatcher(".")
 
-    override fun matches(exchange: ServerWebExchange): Boolean {
+    override fun matches(context: RequestContext): Boolean {
         // 요청의 호스트가 지정된 호스트와 일치하는지 확인
-        return exchange.request.uri.host.let { host ->
+        return context.host().let { host ->
             matcher.match(pattern, host)
         }
     }

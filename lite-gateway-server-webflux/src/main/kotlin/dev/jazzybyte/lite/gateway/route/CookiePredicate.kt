@@ -1,15 +1,16 @@
 package dev.jazzybyte.lite.gateway.route;
 
-import org.springframework.web.server.ServerWebExchange
+import dev.jazzybyte.lite.gateway.context.RequestContext
+
 
 class CookiePredicate (
     private val key: String,
     private val pattern: String? = null
 ): RoutePredicate {
 
-    override fun matches(exchange: ServerWebExchange): Boolean {
+    override fun matches(context: RequestContext): Boolean {
 
-        val cookies = exchange.request.cookies[key] ?: return false
+        val cookies = context.cookies(key) ?: return false
 
         // value 가 null인 경우, 해당 Cookie가 존재하는지만 확인
         pattern ?: return cookies.isNotEmpty()
