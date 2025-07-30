@@ -1,5 +1,6 @@
 package dev.jazzybyte.lite.gateway.route
 
+import dev.jazzybyte.lite.gateway.context.ServerWebExchangeRequestContext
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -14,7 +15,7 @@ class RoutePredicateTest {
             MockServerHttpRequest.get("https://test.com/exact"))
 
         PathPredicate("/exact").matches(
-            serverWebExchange
+            ServerWebExchangeRequestContext(serverWebExchange)
         ).also { assertTrue(it) }
     }
 
@@ -25,7 +26,7 @@ class RoutePredicateTest {
             MockServerHttpRequest.get("https://test.com/test"))
 
         PathPredicate("/*").matches(
-            serverWebExchange
+            ServerWebExchangeRequestContext(serverWebExchange)
         ).also { assertTrue(it) }
 
     }
@@ -36,7 +37,7 @@ class RoutePredicateTest {
             MockServerHttpRequest.get("https://test.com/other"))
 
         PathPredicate("/test").matches(
-            serverWebExchange
+            ServerWebExchangeRequestContext(serverWebExchange)
         ).also { assertFalse(it) }
     }
 
@@ -46,7 +47,7 @@ class RoutePredicateTest {
             MockServerHttpRequest.get("https://test.com/test/"))
 
         PathPredicate("/test/").matches(
-            serverWebExchange
+            ServerWebExchangeRequestContext(serverWebExchange)
         ).also { assertTrue(it) }
     }
 
@@ -56,7 +57,7 @@ class RoutePredicateTest {
                 MockServerHttpRequest.get("https://test.com/test?param=value"))
 
         PathPredicate("/test").matches(
-            serverWebExchange
+            ServerWebExchangeRequestContext(serverWebExchange)
         ).also { assertTrue(it) }
     }
 
@@ -67,7 +68,7 @@ class RoutePredicateTest {
                 MockServerHttpRequest.get("https://test.com/api/vv/resource"))
 
         PathPredicate("/api/v{\\d}/resource").matches(
-            serverWebExchange
+            ServerWebExchangeRequestContext(serverWebExchange)
         ).also { assertTrue(it) }
     }
 
@@ -78,7 +79,7 @@ class RoutePredicateTest {
                 MockServerHttpRequest.get("https://test.com/api/v22/resource"))
 
         PathPredicate("/api/v{\\d{1,3}}/{[a-zA-Z]{1,10}}").matches(
-            serverWebExchange
+            ServerWebExchangeRequestContext(serverWebExchange)
         ).also { assertTrue(it) }
     }
 }

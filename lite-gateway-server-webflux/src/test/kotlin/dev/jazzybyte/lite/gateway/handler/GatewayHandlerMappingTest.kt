@@ -1,5 +1,6 @@
 package dev.jazzybyte.lite.gateway.handler
 
+import dev.jazzybyte.lite.gateway.context.ServerWebExchangeRequestContext
 import dev.jazzybyte.lite.gateway.route.Route
 import dev.jazzybyte.lite.gateway.route.RouteLocator
 import io.mockk.every
@@ -29,14 +30,14 @@ class GatewayHandlerMappingTest {
         val route = Route(
             id = "test-route",
             uri = "https://test.com",
-            predicate = { it.request.uri.path.startsWith("/v1") }
+            predicate = { it.path().startsWith("/v1") }
         )
 
         val exchange = MockServerWebExchange.from(
             MockServerHttpRequest.get("/v1/test").build()
         )
 
-        every { locator.locate(exchange) } returns Mono.just(route)
+        every { locator.locate(any(ServerWebExchangeRequestContext::class)) } returns Mono.just(route)
 
         // when
         val handler = gatewayHandlerMapping.resolveHandler(exchange).block()

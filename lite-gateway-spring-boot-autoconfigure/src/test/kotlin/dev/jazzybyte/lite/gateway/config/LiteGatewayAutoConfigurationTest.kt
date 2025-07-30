@@ -1,11 +1,12 @@
 package dev.jazzybyte.lite.gateway.config
 
+import dev.jazzybyte.lite.gateway.context.ServerWebExchangeRequestContext
 import dev.jazzybyte.lite.gateway.route.PathPredicate
 import dev.jazzybyte.lite.gateway.route.StaticRouteLocator
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.boot.autoconfigure.AutoConfigurations
-import org.springframework.boot.test.context.runner.ApplicationContextRunner
+import org.springframework.boot.test.context.runner.ReactiveWebApplicationContextRunner
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest
 import org.springframework.mock.web.server.MockServerWebExchange
 import kotlin.test.assertTrue
@@ -13,13 +14,13 @@ import kotlin.test.assertTrue
 /**
  * [LiteGatewayAutoConfiguration]에 대한 테스트 클래스.
  *
- * `ApplicationContextRunner`를 사용하여 다양한 조건에서 자동 설정의 동작을 검증합니다.
+ * `ApplicationContextRunner`를 사용하여 다양한 조건에서 자동 설정의 동작을 검증한다.
  */
 class LiteGatewayAutoConfigurationTest {
 
-    // 테스트를 위한 ApplicationContextRunner를 준비합니다.
-    // LiteGatewayAutoConfiguration을 테스트 대상 자동 설정으로 지정합니다.
-    private val contextRunner = ApplicationContextRunner()
+    // 테스트를 위한 ReactiveWebApplicationContextRunner 를 통해 실행한다.
+    // LiteGatewayAutoConfiguration을 테스트 대상 자동 설정으로 지정
+    private val contextRunner = ReactiveWebApplicationContextRunner()
         .withConfiguration(AutoConfigurations.of(LiteGatewayAutoConfiguration::class.java))
 
     @Test
@@ -96,7 +97,7 @@ class LiteGatewayAutoConfigurationTest {
                 val serverWebExchange = MockServerWebExchange.from(
                     MockServerHttpRequest.get("http://test.com/foo/1")
                 )
-                assertTrue { pathPredicate.matches(serverWebExchange) }
+                assertTrue { pathPredicate.matches(ServerWebExchangeRequestContext(serverWebExchange)) }
 
             }
     }

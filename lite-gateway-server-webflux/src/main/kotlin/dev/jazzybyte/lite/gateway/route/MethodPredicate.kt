@@ -2,6 +2,7 @@ package dev.jazzybyte.lite.gateway.route
 
 import dev.jazzybyte.lite.gateway.context.RequestContext
 import dev.jazzybyte.lite.gateway.http.GatewayHttpMethod
+import dev.jazzybyte.lite.gateway.predicate.RoutePredicate
 
 
 class MethodPredicate(

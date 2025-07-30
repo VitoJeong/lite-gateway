@@ -1,5 +1,6 @@
 package dev.jazzybyte.lite.gateway.route
 
+import dev.jazzybyte.lite.gateway.context.ServerWebExchangeRequestContext
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -17,7 +18,7 @@ class CookiePredicateTest {
         )
 
         CookiePredicate(key = "X-Test-Cookie", pattern = "value\\d+").matches(
-            serverWebExchange
+            ServerWebExchangeRequestContext(serverWebExchange)
         ).also { assertTrue(it) }
     }
 
@@ -29,7 +30,7 @@ class CookiePredicateTest {
         )
 
         CookiePredicate(key = "X-Test-Cookie", pattern = null).matches(
-            serverWebExchange
+            ServerWebExchangeRequestContext(serverWebExchange)
         ).also { assertTrue(it) }
     }
 
@@ -41,7 +42,7 @@ class CookiePredicateTest {
         )
 
         CookiePredicate(key = "X-Test-Cookie", pattern = "value\\d+").matches(
-            serverWebExchange
+            ServerWebExchangeRequestContext(serverWebExchange)
         ).also { assertFalse(it) }
     }
 }

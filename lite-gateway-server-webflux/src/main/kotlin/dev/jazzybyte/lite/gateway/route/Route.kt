@@ -1,5 +1,6 @@
 package dev.jazzybyte.lite.gateway.route
 
+import dev.jazzybyte.lite.gateway.predicate.RoutePredicate
 import org.springframework.core.Ordered
 import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
@@ -16,6 +17,7 @@ class Route(
     private var _uri: URI,
     // 라우트의 우선순위, 정수 값이 낮을수록 먼저 처리됨
     private val _order: Int = Ordered.LOWEST_PRECEDENCE,
+//    private val _filters: List<Filter> = emptyList()
 ) {
 
     // 라우트의 고유 식별자

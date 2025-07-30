@@ -1,5 +1,6 @@
 package dev.jazzybyte.lite.gateway.route
 
+import dev.jazzybyte.lite.gateway.context.ServerWebExchangeRequestContext
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -15,7 +16,7 @@ class HostPredicateTest {
         )
 
         HostPredicate("test.com").matches(
-            serverWebExchange
+            ServerWebExchangeRequestContext(serverWebExchange)
         ).also { assertTrue(it) }
     }
 
@@ -26,7 +27,7 @@ class HostPredicateTest {
         )
 
         HostPredicate("test.com").matches(
-            serverWebExchange
+            ServerWebExchangeRequestContext(serverWebExchange)
         ).also { assertFalse(it) }
     }
 
@@ -37,7 +38,7 @@ class HostPredicateTest {
         )
 
         HostPredicate("*.test.com").matches(
-            serverWebExchange
+            ServerWebExchangeRequestContext(serverWebExchange)
         ).also { assertTrue(it) }
     }
 

@@ -1,14 +1,14 @@
 package dev.jazzybyte.lite.gateway.config
 
 import org.springframework.boot.autoconfigure.AutoConfigureBefore
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type
 import org.springframework.boot.autoconfigure.web.reactive.HttpHandlerAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.WebFluxAutoConfiguration
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.web.reactive.DispatcherHandler
 
 /**
  * Lite Gateway의 자동 설정을 위한 클래스입니다.
@@ -23,7 +23,7 @@ import org.springframework.web.reactive.DispatcherHandler
     matchIfMissing = true)
 @EnableConfigurationProperties(LiteGatewayConfigProperties::class)
 @AutoConfigureBefore(HttpHandlerAutoConfiguration::class, WebFluxAutoConfiguration::class)
-@ConditionalOnClass(DispatcherHandler::class)
+@ConditionalOnWebApplication(type = Type.REACTIVE)
 class LiteGatewayAutoConfiguration(
     private val properties: LiteGatewayConfigProperties
 ) {

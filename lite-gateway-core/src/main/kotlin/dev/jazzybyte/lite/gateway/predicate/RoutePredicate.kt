@@ -1,4 +1,4 @@
-package dev.jazzybyte.lite.gateway.route
+package dev.jazzybyte.lite.gateway.predicate
 
 import dev.jazzybyte.lite.gateway.context.RequestContext
 

@@ -1,5 +1,6 @@
 package dev.jazzybyte.lite.gateway.route
 
+import dev.jazzybyte.lite.gateway.predicate.RoutePredicate
 import java.net.URI
 
 /**

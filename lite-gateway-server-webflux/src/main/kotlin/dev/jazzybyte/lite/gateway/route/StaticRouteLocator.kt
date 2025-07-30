@@ -1,7 +1,6 @@
 package dev.jazzybyte.lite.gateway.route
 
-import dev.jazzybyte.lite.gateway.context.ServerWebExchangeRequestContext
-import org.springframework.web.server.ServerWebExchange
+import dev.jazzybyte.lite.gateway.context.RequestContext
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
@@ -19,9 +18,10 @@ class StaticRouteLocator(
     private val sortedRoutes: List<Route> = routes.sortedWith(compareBy<Route> { it.order }
         .thenBy { routes.indexOf(it) })
 
-    override fun locate(exchange: ServerWebExchange): Mono<Route> {
+    override fun locate(context: RequestContext): Mono<Route> {
         return Flux.fromIterable(sortedRoutes)
-            .filter { it.predicates.all { p -> p.matches(ServerWebExchangeRequestContext(exchange)) } }
+            .filter { it.predicates.all { p -> p.matches(context) } }
             .next()
     }
+
 }

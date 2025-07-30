@@ -1,5 +1,6 @@
 package dev.jazzybyte.lite.gateway.route
 
+import dev.jazzybyte.lite.gateway.context.ServerWebExchangeRequestContext
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -16,7 +17,7 @@ class HeaderPredicateTest {
         )
 
         HeaderPredicate("X-Test-Header").matches(
-            serverWebExchange
+            ServerWebExchangeRequestContext(serverWebExchange)
         ).also { assertTrue(it) }
     }
 
@@ -28,7 +29,7 @@ class HeaderPredicateTest {
         )
 
         HeaderPredicate("X-Test-Header,value2").matches(
-            serverWebExchange
+            ServerWebExchangeRequestContext(serverWebExchange)
         ).also { assertFalse(it) }
     }
 
@@ -39,7 +40,7 @@ class HeaderPredicateTest {
         )
 
         HeaderPredicate("X-Test-Header").matches(
-            serverWebExchange
+            ServerWebExchangeRequestContext(serverWebExchange)
         ).also { assertFalse(it) }
     }
 
@@ -51,7 +52,7 @@ class HeaderPredicateTest {
         )
 
         HeaderPredicate("X-Test-Header").matches(
-            serverWebExchange
+            ServerWebExchangeRequestContext(serverWebExchange)
         ).also { assertTrue(it) }
     }
 
@@ -63,7 +64,7 @@ class HeaderPredicateTest {
         )
 
         HeaderPredicate("X-Test-Header, value\\d+").matches(
-            serverWebExchange
+            ServerWebExchangeRequestContext(serverWebExchange)
         ).also { assertTrue(it) }
     }
 }

@@ -1,5 +1,6 @@
 package dev.jazzybyte.lite.gateway.handler
 
+import dev.jazzybyte.lite.gateway.context.ServerWebExchangeRequestContext
 import dev.jazzybyte.lite.gateway.route.RouteLocator
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.web.reactive.handler.AbstractHandlerMapping
@@ -36,7 +37,7 @@ class GatewayHandlerMapping(
     internal fun resolveHandler(exchange: ServerWebExchange): Mono<FilterHandler> {
         log.info { "Resolving handler for request: ${exchange.request.path}" }
 
-        return routeLocator.locate(exchange)
+        return routeLocator.locate(ServerWebExchangeRequestContext(exchange))
             .doOnNext {
                 log.info { "Matched route: ${it.id} for request: ${exchange.request.path}" }
                 exchange.attributes[MATCHED_ROUTE_ATTRIBUTE] = it

@@ -1,6 +1,7 @@
 package dev.jazzybyte.lite.gateway.route
 
 import dev.jazzybyte.lite.gateway.context.RequestContext
+import dev.jazzybyte.lite.gateway.predicate.RoutePredicate
 import org.springframework.util.AntPathMatcher
 
 

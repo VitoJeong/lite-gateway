@@ -3,7 +3,7 @@ package dev.jazzybyte.lite.gateway.config
 import dev.jazzybyte.lite.gateway.route.Route
 import dev.jazzybyte.lite.gateway.route.RouteDefinition
 import dev.jazzybyte.lite.gateway.route.RouteLocator
-import dev.jazzybyte.lite.gateway.route.RoutePredicate
+import dev.jazzybyte.lite.gateway.predicate.RoutePredicate
 import dev.jazzybyte.lite.gateway.route.StaticRouteLocator
 import dev.jazzybyte.lite.gateway.util.ReflectionUtil
 import io.github.oshai.kotlinlogging.KotlinLogging

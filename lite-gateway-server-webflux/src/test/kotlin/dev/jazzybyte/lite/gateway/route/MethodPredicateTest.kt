@@ -1,5 +1,6 @@
 package dev.jazzybyte.lite.gateway.route
 
+import dev.jazzybyte.lite.gateway.context.ServerWebExchangeRequestContext
 import org.junit.jupiter.api.Assertions.*
 
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -14,21 +15,21 @@ class MethodPredicateTest {
  @Test
  fun `matches should return true for matching HTTP method`() {
   val predicate = MethodPredicate("GET")
-  val exchange = MockServerWebExchange.from(
+  val serverWebExchange = MockServerWebExchange.from(
    MockServerHttpRequest.method(HttpMethod.GET, "https://example.com")
   )
 
-  assertTrue(predicate.matches(exchange))
+  assertTrue(predicate.matches(ServerWebExchangeRequestContext(serverWebExchange)))
  }
 
  @Test
  fun `matches should return false for matching HTTP method`() {
   val predicate = MethodPredicate("POST")
-  val exchange = MockServerWebExchange.from(
+  val serverWebExchange = MockServerWebExchange.from(
    MockServerHttpRequest.method(HttpMethod.GET, "https://example.com")
   )
 
-  assertFalse(predicate.matches(exchange))
+  assertFalse(predicate.matches(ServerWebExchangeRequestContext(serverWebExchange)))
  }
 
 }
