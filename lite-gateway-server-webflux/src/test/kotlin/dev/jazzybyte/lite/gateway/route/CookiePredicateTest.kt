@@ -29,7 +29,7 @@ class CookiePredicateTest {
                 .cookie(HttpCookie("X-Test-Cookie", "value1"))
         )
 
-        CookiePredicate(key = "X-Test-Cookie", pattern = null).matches(
+        CookiePredicate(key = "X-Test-Cookie").matches(
             ServerWebExchangeRequestContext(serverWebExchange)
         ).also { assertTrue(it) }
     }

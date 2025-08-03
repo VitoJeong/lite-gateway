@@ -12,14 +12,14 @@ data class PredicateDefinition(
     @field:NotEmpty
     val name: String,
     // ConfigurationProperties가 바인딩할 대상
-    val args: String = ""
+    val args: String? = null
 ) {
     val parsedArgs: Array<String> by lazy {
         parseArgs(args)
     }
 
-    private fun parseArgs(args: String): Array<String> {
-        return if (args.isEmpty()) {
+    private fun parseArgs(args: String?): Array<String> {
+        return if (args.isNullOrEmpty()) {
             emptyArray()
         } else {
             args.split(",").map { it.trim() }.filter { it.isNotEmpty() }.toTypedArray()

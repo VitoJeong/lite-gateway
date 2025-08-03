@@ -30,8 +30,9 @@ data class RouteDefinition(
     val filters: List<FilterDefinition> = emptyList(),
 
     @field:Min(0, message = "order는 0 이상이어야 합니다.")
-    val order: Int = 0
+    var order: Int = 0
 ) {
+
     override fun toString(): String {
         return "RouteDefinition(id='$id', uri='$uri', predicates=$predicates, filters=$filters, order=$order)"
     }

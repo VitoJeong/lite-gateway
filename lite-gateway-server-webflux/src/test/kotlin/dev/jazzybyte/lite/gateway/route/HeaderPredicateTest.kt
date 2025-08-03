@@ -16,7 +16,7 @@ class HeaderPredicateTest {
                 .header("X-Test-Header", "value1")
         )
 
-        HeaderPredicate("X-Test-Header").matches(
+        HeaderPredicate(name = "X-Test-Header").matches(
             ServerWebExchangeRequestContext(serverWebExchange)
         ).also { assertTrue(it) }
     }
@@ -28,7 +28,7 @@ class HeaderPredicateTest {
                 .header("X-Test-Header", "value1")
         )
 
-        HeaderPredicate("X-Test-Header,value2").matches(
+        HeaderPredicate(name = "X-Test-Header", value = "value2").matches(
             ServerWebExchangeRequestContext(serverWebExchange)
         ).also { assertFalse(it) }
     }
@@ -39,7 +39,7 @@ class HeaderPredicateTest {
             MockServerHttpRequest.get("https://test.com")
         )
 
-        HeaderPredicate("X-Test-Header").matches(
+        HeaderPredicate(name = "X-Test-Header").matches(
             ServerWebExchangeRequestContext(serverWebExchange)
         ).also { assertFalse(it) }
     }
@@ -51,7 +51,7 @@ class HeaderPredicateTest {
                 .header("X-Test-Header", "value1")
         )
 
-        HeaderPredicate("X-Test-Header").matches(
+        HeaderPredicate(name = "X-Test-Header").matches(
             ServerWebExchangeRequestContext(serverWebExchange)
         ).also { assertTrue(it) }
     }
@@ -63,7 +63,7 @@ class HeaderPredicateTest {
                 .header("X-Test-Header", "value123")
         )
 
-        HeaderPredicate("X-Test-Header, value\\d+").matches(
+        HeaderPredicate(name = "X-Test-Header", value = "value\\d+").matches(
             ServerWebExchangeRequestContext(serverWebExchange)
         ).also { assertTrue(it) }
     }
