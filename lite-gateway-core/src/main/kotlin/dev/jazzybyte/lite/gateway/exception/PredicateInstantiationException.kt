@@ -1,15 +1,15 @@
 package dev.jazzybyte.lite.gateway.exception
 
 /**
- * Exception thrown when a predicate instance cannot be created.
- * This exception provides detailed information about the predicate that failed to instantiate,
- * including the route context and predicate arguments.
+ * 프레디케이트 인스턴스를 생성할 수 없을 때 발생하는 예외입니다.
+ * 이 예외는 인스턴스화에 실패한 프레디케이트에 대한 자세한 정보를 제공합니다.
+ * 여기에는 라우트 컨텍스트와 프레디케이트 인수도 포함됩니다.
  *
- * @param message The error message describing the instantiation issue
- * @param routeId The ID of the route containing the predicate that failed to instantiate
- * @param predicateName The name of the predicate that failed to instantiate
- * @param predicateArgs The arguments that were provided to the predicate constructor (optional)
- * @param cause The underlying cause of the exception (optional)
+ * @param message 인스턴스화 문제를 설명하는 오류 메시지
+ * @param routeId 인스턴스화에 실패한 프레디케이트를 포함하는 라우트의 ID
+ * @param predicateName 인스턴스화에 실패한 프레디케이트의 이름
+ * @param predicateArgs 프레디케이트 생성자에 제공된 인수 (선택 사항)
+ * @param cause 예외의 근본 원인 (선택 사항)
  */
 class PredicateInstantiationException(
     message: String,

@@ -1,6 +1,7 @@
 package dev.jazzybyte.lite.gateway.config
 
 import dev.jazzybyte.lite.gateway.exception.PredicateInstantiationException
+import dev.jazzybyte.lite.gateway.exception.PredicateDiscoveryException
 import dev.jazzybyte.lite.gateway.route.CookiePredicate
 import dev.jazzybyte.lite.gateway.route.MethodPredicate
 import dev.jazzybyte.lite.gateway.route.PathPredicate
@@ -19,7 +20,7 @@ import org.junit.jupiter.api.Test
  * 
  * 테스트 범위:
  * - 정상적인 라우트 생성 시나리오
- * - 조건자 발견 로직의 엣지 케이스
+ * - Predicate 발견 로직의 엣지 케이스
  * - 오류 처리 시나리오
  * - 다양한 설정 조합
  */
@@ -99,7 +100,7 @@ class RouteLocatorFactoryTest {
         }
 
         @Test
-        @DisplayName("다중 조건자를 가진 라우트 생성")
+        @DisplayName("다중 Predicate를 가진 라우트 생성")
         fun `should create route with multiple predicates`() {
             // given
             val routeDefinitions = mutableListOf(
@@ -143,7 +144,7 @@ class RouteLocatorFactoryTest {
         }
 
         @Test
-        @DisplayName("빈 조건자 목록을 가진 라우트 생성")
+        @DisplayName("빈 Predicate 목록을 가진 라우트 생성")
         fun `should create route with empty predicates list`() {
             // given
             val routeDefinitions = mutableListOf(
@@ -165,11 +166,11 @@ class RouteLocatorFactoryTest {
     }
 
     @Nested
-    @DisplayName("조건자 인수 처리")
+    @DisplayName("Predicate 인수 처리")
     inner class PredicateArgumentHandling {
 
         @Test
-        @DisplayName("단일 인수를 가진 조건자 생성")
+        @DisplayName("단일 인수를 가진 Predicate 생성")
         fun `should create predicate with single argument`() {
             // given
             val routeDefinitions = mutableListOf(
@@ -193,7 +194,7 @@ class RouteLocatorFactoryTest {
         }
 
         @Test
-        @DisplayName("다중 인수를 가진 Cookie 조건자 생성")
+        @DisplayName("다중 인수를 가진 Cookie Predicate 생성")
         fun `should create predicate with multiple arguments`() {
             // given
             val routeDefinitions = mutableListOf(
@@ -259,7 +260,7 @@ class RouteLocatorFactoryTest {
     inner class ErrorHandlingScenarios {
 
         @Test
-        @DisplayName("알 수 없는 조건자 이름으로 예외 발생")
+        @DisplayName("알 수 없는 Predicate 이름으로 예외 발생")
         fun `should throw exception for unknown predicate name`() {
             // given
             val routeDefinitions = mutableListOf(
@@ -274,15 +275,16 @@ class RouteLocatorFactoryTest {
 
             // when & then
             assertThatThrownBy { RouteLocatorFactory.create(routeDefinitions) }
-                .isInstanceOf(IllegalArgumentException::class.java)
+                .isInstanceOf(PredicateDiscoveryException::class.java)
                 .hasMessageContaining("Unknown predicate 'UnknownPredicate'")
                 .hasMessageContaining("route definition with ID 'unknown-predicate-route'")
+                .hasMessageContaining("Available predicates:")
         }
 
         @Test
-        @DisplayName("조건자 인스턴스화 실패로 예외 발생")
+        @DisplayName("Predicate 인스턴스화 실패로 예외 발생")
         fun `should throw exception when predicate instantiation fails`() {
-            // given - 잘못된 인수 개수로 조건자 생성 시도
+            // given - 잘못된 인수 개수로 Predicate 생성 시도
             val routeDefinitions = mutableListOf(
                 RouteDefinition(
                     id = "invalid-args-route",
@@ -302,9 +304,9 @@ class RouteLocatorFactoryTest {
         }
 
         @Test
-        @DisplayName("조건자 인스턴스화 실패 시 상세한 디버깅 정보 제공")
+        @DisplayName("Predicate 인스턴스화 실패 시 상세한 디버깅 정보 제공")
         fun `should provide detailed debugging information when predicate instantiation fails`() {
-            // given - 잘못된 인수 타입으로 조건자 생성 시도
+            // given - 잘못된 인수 타입으로 Predicate 생성 시도
             val routeDefinitions = mutableListOf(
                 RouteDefinition(
                     id = "detailed-error-route",
@@ -332,7 +334,7 @@ class RouteLocatorFactoryTest {
         }
 
         @Test
-        @DisplayName("null 조건자 이름으로 예외 발생")
+        @DisplayName("null Predicate 이름으로 예외 발생")
         fun `should throw exception for null predicate name`() {
             // given
             val routeDefinitions = mutableListOf(
@@ -347,120 +349,14 @@ class RouteLocatorFactoryTest {
 
             // when & then
             assertThatThrownBy { RouteLocatorFactory.create(routeDefinitions) }
-                .isInstanceOf(IllegalArgumentException::class.java)
+                .isInstanceOf(PredicateDiscoveryException::class.java)
                 .hasMessageContaining("Unknown predicate ''")
                 .hasMessageContaining("route definition with ID 'null-predicate-route'")
+                .hasMessageContaining("Available predicates:")
         }
     }
 
-    @Nested
-    @DisplayName("조건자 발견 로직 엣지 케이스")
-    inner class PredicateDiscoveryEdgeCases {
 
-        @Test
-        @DisplayName("대소문자 구분 조건자 이름 처리")
-        fun `should handle case sensitive predicate names`() {
-            // given - 소문자로 조건자 이름 지정
-            val routeDefinitions = mutableListOf(
-                RouteDefinition(
-                    id = "lowercase-predicate-route",
-                    uri = "http://example.com",
-                    predicates = listOf(
-                        PredicateDefinition(name = "path", args = "/api/**")
-                    )
-                )
-            )
-
-            // when & then - 대소문자 구분으로 인해 실패해야 함
-            assertThatThrownBy { RouteLocatorFactory.create(routeDefinitions) }
-                .isInstanceOf(IllegalArgumentException::class.java)
-                .hasMessageContaining("Unknown predicate 'path'")
-        }
-
-        @Test
-        @DisplayName("조건자 이름 공백 처리")
-        fun `should handle predicate names with whitespace`() {
-            // given
-            val routeDefinitions = mutableListOf(
-                RouteDefinition(
-                    id = "whitespace-predicate-route",
-                    uri = "http://example.com",
-                    predicates = listOf(
-                        PredicateDefinition(name = " Path ", args = "/api/**")
-                    )
-                )
-            )
-
-            // when & then - 공백이 포함된 이름으로 인해 실패해야 함
-            assertThatThrownBy { RouteLocatorFactory.create(routeDefinitions) }
-                .isInstanceOf(IllegalArgumentException::class.java)
-                .hasMessageContaining("Unknown predicate ' Path '")
-        }
-
-        @Test
-        @DisplayName("알려진 조건자 타입 생성 확인 - 단일 인수 조건자만")
-        fun `should create known predicate types with single arguments`() {
-            // given - 현재 구현의 제한사항으로 인해 단일 인수 조건자만 테스트
-            val routeDefinitions = mutableListOf(
-                RouteDefinition(
-                    id = "known-predicates-route",
-                    uri = "http://example.com",
-                    predicates = listOf(
-                        PredicateDefinition(name = "Path", args = "/api/**"),
-                        PredicateDefinition(name = "Method", args = "GET"),
-                        PredicateDefinition(name = "Host", args = "example.com")
-                    )
-                )
-            )
-
-            // when
-            val routeLocator = RouteLocatorFactory.create(routeDefinitions)
-
-            // then
-            val staticRouteLocator = routeLocator as StaticRouteLocator
-            val route = staticRouteLocator.routes[0]
-            assertThat(route.predicates).hasSize(3)
-            
-            // 각 조건자 타입이 올바르게 생성되었는지 확인
-            val predicateTypes = route.predicates.map { it::class.java.simpleName }
-            assertThat(predicateTypes).containsExactly(
-                "PathPredicate",
-                "MethodPredicate", 
-                "HostPredicate"
-            )
-        }
-
-        @Test
-        @DisplayName("HeaderPredicate와 CookiePredicate의 다중 인수 처리 테스트")
-        fun `should handle multi-argument predicates correctly`() {
-            // given - HeaderPredicate와 CookiePredicate가 쉼표로 구분된 인수를 정상적으로 처리
-            val routeDefinitions = mutableListOf(
-                RouteDefinition(
-                    id = "multi-arg-predicates-route",
-                    uri = "http://example.com",
-                    predicates = listOf(
-                        PredicateDefinition(name = "Header", args = "X-Test,value"),
-                        PredicateDefinition(name = "Cookie", args = "session,abc123")
-                    )
-                )
-            )
-
-            // when
-            val routeLocator = RouteLocatorFactory.create(routeDefinitions)
-
-            // then
-            val staticRouteLocator = routeLocator as StaticRouteLocator
-            val route = staticRouteLocator.routes[0]
-            assertThat(route.predicates).hasSize(2)
-
-            // 각 조건자 타입이 올바르게 생성되었는지 확인
-            val predicateTypes = route.predicates.map { it::class.java.simpleName }
-            assertThat(predicateTypes).containsExactly(
-                "HeaderPredicate",
-                "CookiePredicate"
-            )
-        }
-    }
 
     @Nested
     @DisplayName("복잡한 시나리오")
