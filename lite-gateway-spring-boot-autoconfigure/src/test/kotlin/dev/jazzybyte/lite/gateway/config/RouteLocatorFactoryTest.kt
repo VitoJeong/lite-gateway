@@ -363,8 +363,8 @@ class RouteLocatorFactoryTest {
     inner class ComplexScenarios {
 
         @Test
-        @DisplayName("동일한 order를 가진 라우트들의 처리")
-        fun `should handle routes with same order`() {
+        @DisplayName("동일한 order를 가진 라우트들의 처리 - 예외 발생")
+        fun `should throw exception for routes with duplicate order values`() {
             // given
             val routeDefinitions = mutableListOf(
                 RouteDefinition(
@@ -381,12 +381,11 @@ class RouteLocatorFactoryTest {
                 )
             )
 
-            // when
-            val routeLocator = RouteLocatorFactory.create(routeDefinitions)
-
-            // then - 예외 없이 생성되어야 함
-            val staticRouteLocator = routeLocator as StaticRouteLocator
-            assertThat(staticRouteLocator.routes).hasSize(2)
+            // when & then
+            assertThatThrownBy { RouteLocatorFactory.create(routeDefinitions) }
+                .isInstanceOf(dev.jazzybyte.lite.gateway.exception.RouteConfigurationException::class.java)
+                .hasMessageContaining("Duplicate order values found in route definitions")
+                .hasMessageContaining("order 1: [route-a, route-b]")
         }
 
         @Test
@@ -453,6 +452,119 @@ class RouteLocatorFactoryTest {
             val staticRouteLocator = routeLocator as StaticRouteLocator
             val route = staticRouteLocator.routes[0]
             assertThat(route.uri.toString()).isEqualTo("http://example.com:8080/path?param=value&other=test")
+        }
+
+        @Test
+        @DisplayName("다중 중복 order 값 검증")
+        fun `should throw exception for multiple duplicate order values`() {
+            // given
+            val routeDefinitions = mutableListOf(
+                RouteDefinition(
+                    id = "route-1a",
+                    uri = "http://example1a.com",
+                    predicates = listOf(PredicateDefinition(name = "Path", args = "/1a/**")),
+                    order = 1
+                ),
+                RouteDefinition(
+                    id = "route-1b",
+                    uri = "http://example1b.com",
+                    predicates = listOf(PredicateDefinition(name = "Path", args = "/1b/**")),
+                    order = 1
+                ),
+                RouteDefinition(
+                    id = "route-2a",
+                    uri = "http://example2a.com",
+                    predicates = listOf(PredicateDefinition(name = "Path", args = "/2a/**")),
+                    order = 2
+                ),
+                RouteDefinition(
+                    id = "route-2b",
+                    uri = "http://example2b.com",
+                    predicates = listOf(PredicateDefinition(name = "Path", args = "/2b/**")),
+                    order = 2
+                ),
+                RouteDefinition(
+                    id = "route-3",
+                    uri = "http://example3.com",
+                    predicates = listOf(PredicateDefinition(name = "Path", args = "/3/**")),
+                    order = 3
+                )
+            )
+
+            // when & then
+            assertThatThrownBy { RouteLocatorFactory.create(routeDefinitions) }
+                .isInstanceOf(dev.jazzybyte.lite.gateway.exception.RouteConfigurationException::class.java)
+                .hasMessageContaining("Duplicate order values found in route definitions")
+                .hasMessageContaining("order 1: [route-1a, route-1b]")
+                .hasMessageContaining("order 2: [route-2a, route-2b]")
+        }
+
+        @Test
+        @DisplayName("세 개 이상의 라우트가 동일한 order를 가진 경우")
+        fun `should throw exception for three or more routes with same order`() {
+            // given
+            val routeDefinitions = mutableListOf(
+                RouteDefinition(
+                    id = "route-a",
+                    uri = "http://example-a.com",
+                    predicates = listOf(PredicateDefinition(name = "Path", args = "/a/**")),
+                    order = 5
+                ),
+                RouteDefinition(
+                    id = "route-b",
+                    uri = "http://example-b.com",
+                    predicates = listOf(PredicateDefinition(name = "Path", args = "/b/**")),
+                    order = 5
+                ),
+                RouteDefinition(
+                    id = "route-c",
+                    uri = "http://example-c.com",
+                    predicates = listOf(PredicateDefinition(name = "Path", args = "/c/**")),
+                    order = 5
+                )
+            )
+
+            // when & then
+            assertThatThrownBy { RouteLocatorFactory.create(routeDefinitions) }
+                .isInstanceOf(dev.jazzybyte.lite.gateway.exception.RouteConfigurationException::class.java)
+                .hasMessageContaining("Duplicate order values found in route definitions")
+                .hasMessageContaining("order 5: [route-a, route-b, route-c]")
+        }
+
+        @Test
+        @DisplayName("고유한 order 값들만 있는 경우 정상 처리")
+        fun `should handle routes with unique order values successfully`() {
+            // given
+            val routeDefinitions = mutableListOf(
+                RouteDefinition(
+                    id = "route-1",
+                    uri = "http://example1.com",
+                    predicates = listOf(PredicateDefinition(name = "Path", args = "/1/**")),
+                    order = 1
+                ),
+                RouteDefinition(
+                    id = "route-2",
+                    uri = "http://example2.com",
+                    predicates = listOf(PredicateDefinition(name = "Path", args = "/2/**")),
+                    order = 2
+                ),
+                RouteDefinition(
+                    id = "route-3",
+                    uri = "http://example3.com",
+                    predicates = listOf(PredicateDefinition(name = "Path", args = "/3/**")),
+                    order = 3
+                )
+            )
+
+            // when
+            val routeLocator = RouteLocatorFactory.create(routeDefinitions)
+
+            // then - 예외 없이 성공적으로 생성되어야 함
+            val staticRouteLocator = routeLocator as StaticRouteLocator
+            assertThat(staticRouteLocator.routes).hasSize(3)
+            assertThat(staticRouteLocator.routes[0].id).isEqualTo("route-1")
+            assertThat(staticRouteLocator.routes[1].id).isEqualTo("route-2")
+            assertThat(staticRouteLocator.routes[2].id).isEqualTo("route-3")
         }
     }
 }
