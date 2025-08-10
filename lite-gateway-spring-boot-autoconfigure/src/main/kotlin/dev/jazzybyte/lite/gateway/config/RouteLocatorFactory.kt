@@ -22,7 +22,6 @@ private val log = KotlinLogging.logger {}
  * - PredicateRegistry: Predicate 클래스 발견 및 관리
  * - RouteBuilder: 라우트 생성 로직
  * - UriValidator: URI 검증 로직
- * - RouteCreationLogger: 로깅 및 성능 메트릭
  */
 class RouteLocatorFactory {
 
@@ -31,14 +30,13 @@ class RouteLocatorFactory {
         private val predicateRegistry = PredicateRegistry()
         private val uriValidator = UriValidator()
         private val routeBuilder = RouteBuilder(predicateRegistry, uriValidator)
-        private val logger = RouteCreationLogger()
 
         /**
          * RouteDefinition 목록으로부터 RouteLocator를 생성합니다.
          */
         fun create(routeDefinitions: @NotNull @Valid MutableList<RouteDefinition>): RouteLocator {
             val startTime = System.currentTimeMillis()
-            logger.logRouteCreationStart(routeDefinitions.size)
+            log.info { "Starting route creation process for ${routeDefinitions.size} route definitions" }
 
             val routes = createRoutes(routeDefinitions)
                 .sortedBy { it.order }
@@ -47,7 +45,7 @@ class RouteLocatorFactory {
             validateRouteOrders(routeDefinitions)
 
             val totalCreationTime = System.currentTimeMillis() - startTime
-            logger.logRouteCreationCompletion(routes, totalCreationTime)
+            logRouteCreationCompletion(routes, totalCreationTime)
 
             return StaticRouteLocator(routes)
         }
@@ -68,41 +66,99 @@ class RouteLocatorFactory {
             val routeStartTime = System.currentTimeMillis()
 
             try {
-                logger.logRouteCreationProgress(def.id, currentIndex, totalCount)
+                log.debug { "Creating route $currentIndex/$totalCount: '${def.id}'" }
 
                 // RouteBuilder를 사용하여 라우트 생성
                 val route = routeBuilder.buildRoute(def)
                 val routeCreationTime = System.currentTimeMillis() - routeStartTime
 
-                logger.logRouteCreationSuccess(def, route.predicates, route, routeCreationTime)
-                logger.logPredicateMappings(def, route.predicates, predicateRegistry)
+                log.info {
+                    "Successfully created route '${def.id}': " +
+                    "uri='${def.uri}', " +
+                    "predicates=${route.predicates.size}, " +
+                    "order=${route.order}, " +
+                    "creation_time=${routeCreationTime}ms"
+                }
+
+                logPredicateMappings(def, route, predicateRegistry)
 
                 return route
 
             } catch (e: RouteConfigurationException) {
                 val routeCreationTime = System.currentTimeMillis() - routeStartTime
-                logger.logRouteCreationFailure(def, routeCreationTime, e)
+                logRouteCreationFailure(def, routeCreationTime, e)
                 // RouteConfigurationException은 그대로 전파
                 throw e
             } catch (e: PredicateDiscoveryException) {
                 val routeCreationTime = System.currentTimeMillis() - routeStartTime
-                logger.logRouteCreationFailure(def, routeCreationTime, e)
+                logRouteCreationFailure(def, routeCreationTime, e)
                 // Predicate 관련 예외는 원본 그대로 전파 (기존 테스트 호환성 유지)
                 throw e
             } catch (e: PredicateInstantiationException) {
                 val routeCreationTime = System.currentTimeMillis() - routeStartTime
-                logger.logRouteCreationFailure(def, routeCreationTime, e)
+                logRouteCreationFailure(def, routeCreationTime, e)
                 // Predicate 인스턴스화 예외는 원본 그대로 전파 (기존 테스트 호환성 유지)
                 throw e
             } catch (e: Exception) {
                 val routeCreationTime = System.currentTimeMillis() - routeStartTime
-                logger.logRouteCreationFailure(def, routeCreationTime, e)
+                logRouteCreationFailure(def, routeCreationTime, e)
                 // 기타 예외를 RouteConfigurationException으로 래핑
                 throw RouteConfigurationException(
                     message = "Unexpected error during route creation: ${e.message}",
                     routeId = def.id,
                     cause = e
                 )
+            }
+        }
+
+        /**
+         * 라우트 생성 완료를 로깅합니다.
+         */
+        private fun logRouteCreationCompletion(routes: List<Route>, totalCreationTime: Long) {
+            val totalPredicates = routes.sumOf { it.predicates.size }
+            val orderRange = if (routes.isNotEmpty()) {
+                "${routes.minOf { it.order }}..${routes.maxOf { it.order }}"
+            } else {
+                "N/A"
+            }
+            val avgCreationTime = if (routes.isNotEmpty()) totalCreationTime / routes.size else 0
+            
+            log.info { 
+                "Route creation completed successfully: " +
+                "total_routes=${routes.size}, " +
+                "total_predicates=$totalPredicates, " +
+                "order_range=[$orderRange], " +
+                "total_creation_time=${totalCreationTime}ms, " +
+                "avg_route_creation_time=${avgCreationTime}ms" 
+            }
+            
+            // 각 라우트 요약 정보 로깅
+            routes.forEach { route ->
+                log.debug { "Route summary: id='${route.id}', uri='${route.uri}', predicates=${route.predicates.size}, order=${route.order}" }
+            }
+        }
+
+        /**
+         * Predicate 매핑 정보를 로깅합니다.
+         */
+        private fun logPredicateMappings(def: RouteDefinition, route: Route, predicateRegistry: PredicateRegistry) {
+            if (def.predicates.isNotEmpty()) {
+                val predicateMappings = def.predicates.mapIndexed { idx, predicate ->
+                    val predicateClass = predicateRegistry.getPredicateClass(predicate.name)
+                    "predicate_${idx + 1}=[name='${predicate.name}', args='${predicate.args}', class='${predicateClass?.simpleName}']"
+                }.joinToString(", ")
+                log.debug { "Route '${def.id}' predicate mappings: $predicateMappings" }
+            }
+        }
+
+        /**
+         * 라우트 생성 실패를 로깅합니다.
+         */
+        private fun logRouteCreationFailure(def: RouteDefinition, routeCreationTime: Long, e: Exception) {
+            log.error { 
+                "Failed to create route '${def.id}' after ${routeCreationTime}ms. " +
+                "Route definition: [id='${def.id}', uri='${def.uri}', predicates=${def.predicates}, filters=${def.filters}, order=${def.order}]. " +
+                "Error: ${e.message}" 
             }
         }
 
