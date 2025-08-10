@@ -3,7 +3,7 @@ package dev.jazzybyte.lite.gateway.route
 import dev.jazzybyte.lite.gateway.filter.FilterDefinition
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Min
-import jakarta.validation.constraints.NotEmpty
+import jakarta.validation.constraints.NotBlank
 import org.springframework.validation.annotation.Validated
 import java.util.*
 
@@ -20,7 +20,7 @@ import java.util.*
 data class RouteDefinition(
     val id: String = UUID.randomUUID().toString(),
 
-    @field:NotEmpty(message = "URI는 비어 있을 수 없습니다.")
+    @field:NotBlank(message = "URI는 비어 있을 수 없습니다.")
     val uri: String,
 
     @field:Valid

@@ -6,7 +6,7 @@ import dev.jazzybyte.lite.gateway.predicate.RoutePredicate
 
 class CookiePredicate (
     private val key: String,
-    private val pattern: String = "*"
+    private val pattern: String = ".*"
 ): RoutePredicate {
 
     override fun matches(context: RequestContext): Boolean {

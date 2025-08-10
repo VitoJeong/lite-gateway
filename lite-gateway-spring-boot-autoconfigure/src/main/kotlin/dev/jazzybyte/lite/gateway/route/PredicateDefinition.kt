@@ -1,6 +1,6 @@
 package dev.jazzybyte.lite.gateway.route
 
-import jakarta.validation.constraints.NotEmpty
+import jakarta.validation.constraints.NotBlank
 import org.springframework.validation.annotation.Validated
 
 /**
@@ -9,7 +9,7 @@ import org.springframework.validation.annotation.Validated
  */
 @Validated
 data class PredicateDefinition(
-    @field:NotEmpty
+    @field:NotBlank(message = "비어 있을 수 없습니다")
     val name: String,
     // ConfigurationProperties가 바인딩할 대상
     val args: String? = null
