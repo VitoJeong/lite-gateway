@@ -63,16 +63,16 @@ class Route(
 
     constructor(
         id: String,
-        predicate: RoutePredicate,
         uri: String,
+        predicate: RoutePredicate,
         order: Int = Int.MAX_VALUE,
     ) : this(id, listOf(predicate), createUriWithIdnSupport(uri), order)
 
     constructor(
         id: String,
         uri: String,
-        order: Int = Int.MAX_VALUE,
         predicates: List<RoutePredicate>,
+        order: Int = Int.MAX_VALUE,
     ) : this(id, predicates, createUriWithIdnSupport(uri), order)
 
     companion object {
