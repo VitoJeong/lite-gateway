@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: lite-gateway-sample
+
+lite:
+  gateway:
+    routes:
+      - id: test-route
+        uri: http://example.com
+        predicates:
+          - name: Path
+            args: /foo/**
