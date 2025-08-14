@@ -1,6 +1,8 @@
 package dev.jazzybyte.lite.gateway.config
 
 import dev.jazzybyte.lite.gateway.context.ServerWebExchangeRequestContext
+import dev.jazzybyte.lite.gateway.handler.FilterHandler
+import dev.jazzybyte.lite.gateway.handler.GatewayHandlerMapping
 import dev.jazzybyte.lite.gateway.route.PathPredicate
 import dev.jazzybyte.lite.gateway.route.StaticRouteLocator
 import org.assertj.core.api.Assertions.assertThat
@@ -98,6 +100,9 @@ class LiteGatewayAutoConfigurationTest {
                     MockServerHttpRequest.get("http://test.com/foo/1")
                 )
                 assertTrue { pathPredicate.matches(ServerWebExchangeRequestContext(serverWebExchange)) }
+
+                assertThat(context).hasSingleBean(FilterHandler::class.java)
+                assertThat(context).hasSingleBean(GatewayHandlerMapping::class.java)
 
             }
     }

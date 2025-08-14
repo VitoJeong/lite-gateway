@@ -1,5 +1,9 @@
 package dev.jazzybyte.lite.gateway.config
 
+import dev.jazzybyte.lite.gateway.handler.FilterHandler
+import dev.jazzybyte.lite.gateway.handler.GatewayHandlerMapping
+import dev.jazzybyte.lite.gateway.route.RouteLocator
+import dev.jazzybyte.lite.gateway.route.StaticRouteLocator
 import org.springframework.boot.autoconfigure.AutoConfigureBefore
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
@@ -31,5 +35,14 @@ class LiteGatewayAutoConfiguration(
     @Bean
     fun routeLocator() = RouteLocatorFactory.create(properties.routes)
 
+    @Bean
+    fun filterHandler() = FilterHandler()
 
+    @Bean
+    fun gatewayHandlerMapping(
+        routeLocator: RouteLocator,
+        filterHandler: FilterHandler,
+    ): GatewayHandlerMapping {
+        return GatewayHandlerMapping(routeLocator, filterHandler)
+    }
 }
