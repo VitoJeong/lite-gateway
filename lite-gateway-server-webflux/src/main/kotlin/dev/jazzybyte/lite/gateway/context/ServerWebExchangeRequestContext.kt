@@ -49,4 +49,9 @@ class ServerWebExchangeRequestContext (
             GatewayHttpCookie(it.name, it.value)
         }
     }
+
+    override fun toString(): String {
+        return "ServerWebExchangeRequestContext(host='${host()}', path='${path()}', method=${method()})"
+    }
+
 }

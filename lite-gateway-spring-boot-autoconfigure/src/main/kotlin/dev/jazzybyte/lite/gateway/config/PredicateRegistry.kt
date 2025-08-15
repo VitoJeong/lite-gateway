@@ -65,23 +65,23 @@ class PredicateRegistry {
             
             val discoveryTime = System.currentTimeMillis() - discoveryStartTime
             
-            // Predicate 클래스 발견 시 이름과 클래스 매핑을 구조화된 형태로 로깅 (요구사항 5.2)
-            log.info { 
+            // Predicate 클래스 발견 시 이름과 클래스 매핑을 구조화된 형태로 로깅
+            log.info {
                 "Predicate discovery completed successfully: " +
                 "discovered_classes=${discoveredClasses.size}, " +
                 "registered_predicates=${predicateMap.size}, " +
                 "discovery_time=${discoveryTime}ms"
             }
-            
-            // 각 Predicate 이름과 클래스 매핑의 상세 로깅
-            predicateMap.forEach { (name, clazz) ->
-                log.info { "Registered predicate mapping: name='$name' -> class='${clazz.name}'" }
-            }
-            
+
             // 디버그 레벨에서 추가 상세 정보 제공
             if (log.isDebugEnabled()) {
+                // 각 Predicate 이름과 클래스 매핑의 상세 로깅
+                predicateMap.forEach { (name, clazz) ->
+                    log.debug { "Registered predicate mapping: name='$name' -> class='${clazz.name}'" }
+                }
+
                 log.debug { "Complete predicate class mappings: $predicateMap" }
-                
+
                 // 각 클래스의 생성자 정보도 로깅
                 predicateMap.forEach { (name, clazz) ->
                     val constructors = clazz.constructors.map { constructor ->

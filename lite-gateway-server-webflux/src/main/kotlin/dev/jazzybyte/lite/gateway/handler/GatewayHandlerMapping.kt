@@ -35,9 +35,10 @@ class GatewayHandlerMapping(
     override fun getHandlerInternal(exchange: ServerWebExchange): Mono<FilterHandler> = resolveHandler(exchange)
 
     internal fun resolveHandler(exchange: ServerWebExchange): Mono<FilterHandler> {
-        log.info { "Resolving handler for request: ${exchange.request.path}" }
+        val requestContext = ServerWebExchangeRequestContext(exchange)
+        log.info { "Resolving handler for request: $requestContext" }
 
-        return routeLocator.locate(ServerWebExchangeRequestContext(exchange))
+        return routeLocator.locate(requestContext)
             .doOnNext {
                 log.info { "Matched route: ${it.id} for request: ${exchange.request.path}" }
                 exchange.attributes[MATCHED_ROUTE_ATTRIBUTE] = it

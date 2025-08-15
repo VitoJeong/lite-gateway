@@ -10,3 +10,8 @@ lite:
         predicates:
           - name: Path
             args: /foo/**
+
+logging:
+  level:
+    root: info
+    lite.gateway: debug
