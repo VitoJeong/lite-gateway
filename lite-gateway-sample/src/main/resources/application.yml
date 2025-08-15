@@ -5,12 +5,28 @@ spring:
 lite:
   gateway:
     routes:
-      - id: test-route
-        uri: http://example.com
-        predicates:
-          - name: Path
-            args: /foo/**
-
+    - id: test-route
+      uri: https://httpbin.org
+      predicates:
+        - name: Method
+          args: GET
+      order: 1
+    - id: jsonplaceholder-route
+      uri: https://jsonplaceholder.typicode.com
+      predicates:
+        - name: Method
+          args: POST
+        - name: Path
+          args: /posts/**
+      order: 2
+    - id: postman-echo-route
+      uri: https://postman-echo.com
+      predicates:
+        - name: Path
+          args: /post/**
+        - name: Header
+          args: "Content-Type, multipart/form-data.*"
+      order: 3
 logging:
   level:
     root: info

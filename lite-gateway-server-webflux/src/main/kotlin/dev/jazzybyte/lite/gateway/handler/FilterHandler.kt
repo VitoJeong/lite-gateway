@@ -6,18 +6,22 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import io.netty.channel.ChannelOption
 import org.springframework.core.io.buffer.DataBuffer
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.http.server.reactive.ServerHttpRequest
 import org.springframework.web.reactive.function.client.ExchangeStrategies
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.WebClientResponseException
 import org.springframework.web.reactive.function.client.body
 import org.springframework.web.server.ServerWebExchange
 import org.springframework.web.server.WebHandler
 import reactor.core.publisher.Mono
 import reactor.netty.http.client.HttpClient
+import java.net.ConnectException
 import java.net.URI
 import java.net.URLEncoder
+import java.net.UnknownHostException
 import java.nio.charset.StandardCharsets
 import java.time.Duration
 
@@ -42,32 +46,23 @@ class FilterHandler : WebHandler {
             )
         )
         .build()
-
     override fun handle(exchange: ServerWebExchange): Mono<Void> {
         val matchedRoute = exchange.attributes[MATCHED_ROUTE_ATTRIBUTE] as? Route
-        // 라우팅 정보가 없으면 요청을 종료시킨다.
         matchedRoute ?: return handleNoRoute(exchange)
 
-        val targetUri = matchedRoute.uri.resolve(exchange.request.uri.path + buildQueryString(exchange.request))
+        val targetUri = matchedRoute.uri.resolve(
+            exchange.request.uri.path + buildQueryString(exchange.request)
+        )
         log.info { "Forwarding request to: $targetUri" }
 
         return forwardRequest(exchange, targetUri)
     }
 
-    /**
-     * 매칭된 라우팅 정보가 없을 경우, 404 Not Found 응답을 반환한다.
-     */
     private fun handleNoRoute(exchange: ServerWebExchange): Mono<Void> {
         log.warn { "No matched route found in exchange attributes." }
 
         val message = "No route matched for request: ${exchange.request.uri}"
-        val buffer = exchange.response.bufferFactory()
-            .wrap(message.toByteArray(StandardCharsets.UTF_8))
-
-        exchange.response.statusCode = HttpStatus.NOT_FOUND
-        exchange.response.headers.contentType = MediaType.TEXT_PLAIN
-
-        return exchange.response.writeWith(Mono.just(buffer))
+        return writeTextResponse(exchange, HttpStatus.NOT_FOUND, message)
     }
 
     private fun forwardRequest(exchange: ServerWebExchange, targetUri: URI): Mono<Void> {
@@ -80,6 +75,41 @@ class FilterHandler : WebHandler {
                 exchange.response.headers.putAll(clientResponse.headers().asHttpHeaders())
                 exchange.response.writeWith(clientResponse.bodyToFlux(DataBuffer::class.java))
             }
+            .onErrorResume { ex ->
+                when (ex) {
+                    is UnknownHostException -> {
+                        log.error(ex) { "Unknown host: ${targetUri.host}" }
+                        writeTextResponse(exchange, HttpStatus.BAD_GATEWAY, "Unknown host: ${targetUri.host}")
+                    }
+                    is ConnectException -> {
+                        log.error(ex) { "Connection failed to: $targetUri" }
+                        writeTextResponse(exchange, HttpStatus.BAD_GATEWAY, "Connection failed to: $targetUri")
+                    }
+                    is WebClientResponseException -> {
+                        log.error(ex) { "Upstream error: ${ex.message}" }
+                        writeTextResponse(exchange, ex.statusCode, "Upstream error: ${ex.statusText}")
+                    }
+                    else -> {
+                        log.error(ex) { "Unexpected error while forwarding to: $targetUri" }
+                        writeTextResponse(exchange, HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error: ${ex.message}")
+                    }
+                }
+            }
+    }
+
+    /**
+     * 텍스트 기반 응답을 작성하는 유틸리티 메서드
+     */
+    private fun writeTextResponse(
+        exchange: ServerWebExchange,
+        status: HttpStatusCode,
+        message: String
+    ): Mono<Void> {
+        val buffer = exchange.response.bufferFactory()
+            .wrap(message.toByteArray(StandardCharsets.UTF_8))
+        exchange.response.statusCode = status
+        exchange.response.headers.contentType = MediaType.TEXT_PLAIN
+        return exchange.response.writeWith(Mono.just(buffer))
     }
 
     /**
