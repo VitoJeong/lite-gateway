@@ -30,8 +30,21 @@ private val log = KotlinLogging.logger {}
  * WebClient를 사용하여 비동기 HTTP 요청을 처리합니다.
  */
 class WebFluxHttpClient (
-    private val client: WebClient = create()
+    private val maxConnections: Int,
+    private val connectionTimeout: Int,
+    private val maxHeaderSize: Int,
+    private val acquireTimeout: Int,
 ) {
+
+    private val client: WebClient = create(maxConnections, connectionTimeout, maxHeaderSize, acquireTimeout)
+
+    constructor() : this(
+        maxConnections = 500,
+        connectionTimeout = 5 * 1000,
+        maxHeaderSize = 8192,
+        acquireTimeout = 10 * 1000
+    )
+
     companion object {
         /**
          * WebClient 인스턴스를 생성합니다.
@@ -39,7 +52,10 @@ class WebFluxHttpClient (
          * @param properties HTTP 클라이언트 설정 속성
          * @return 생성된 WebClient 인스턴스
          */
-        fun create(): WebClient {
+        fun create(maxConnections: Int,
+                   connectionTimeout: Int,
+                   maxHeaderSize: Int,
+                   acquireTimeout: Int): WebClient {
             return WebClient.builder()
                 .exchangeStrategies(
                     ExchangeStrategies.builder()
@@ -58,7 +74,7 @@ class WebFluxHttpClient (
                             // 응답 타임아웃 설정
                             .responseTimeout(Duration.ofSeconds(5))
                             // 연결 타임아웃 설정
-                            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 20 * 1000)
+                            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, acquireTimeout)
                     )
                 )
                 .build()

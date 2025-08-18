@@ -5,8 +5,11 @@ import dev.jazzybyte.lite.gateway.client.WebFluxHttpClient
 
 class WebClientFactory {
     companion object {
-        fun create(httpClient: HttpClientProperties): WebFluxHttpClient {
-            return WebFluxHttpClient()
+        fun create(properties: HttpClientProperties): WebFluxHttpClient {
+            return WebFluxHttpClient(properties.maxConnections,
+                properties.connectionTimeout,
+                properties.maxHeaderSize,
+                properties.acquireTimeout)
         }
     }
 }
