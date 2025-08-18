@@ -1,5 +1,6 @@
 package dev.jazzybyte.lite.gateway.handler
 
+import dev.jazzybyte.lite.gateway.client.WebFluxHttpClient
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -39,7 +40,8 @@ class FilterHandlerTest {
     @EnableAutoConfiguration
     @SpringBootConfiguration
     class TestConfig {
+
         @Bean
-        fun filterHandler() = FilterHandler()
+        fun filterHandler() = FilterHandler(WebFluxHttpClient())
     }
 }

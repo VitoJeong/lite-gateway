@@ -1,51 +1,25 @@
 package dev.jazzybyte.lite.gateway.handler
 
+import dev.jazzybyte.lite.gateway.client.WebFluxHttpClient
 import dev.jazzybyte.lite.gateway.handler.GatewayHandlerMapping.Companion.MATCHED_ROUTE_ATTRIBUTE
 import dev.jazzybyte.lite.gateway.route.Route
 import io.github.oshai.kotlinlogging.KotlinLogging
-import io.netty.channel.ChannelOption
-import org.springframework.core.io.buffer.DataBuffer
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.MediaType
-import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.http.server.reactive.ServerHttpRequest
-import org.springframework.web.reactive.function.client.ExchangeStrategies
-import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.WebClientResponseException
-import org.springframework.web.reactive.function.client.body
 import org.springframework.web.server.ServerWebExchange
 import org.springframework.web.server.WebHandler
 import reactor.core.publisher.Mono
-import reactor.netty.http.client.HttpClient
-import java.net.ConnectException
-import java.net.URI
 import java.net.URLEncoder
-import java.net.UnknownHostException
 import java.nio.charset.StandardCharsets
-import java.time.Duration
 
 private val log = KotlinLogging.logger {}
 
-class FilterHandler : WebHandler {
+class FilterHandler(
+    private val webclient: WebFluxHttpClient
+) : WebHandler {
 
-    private val webClient = WebClient.builder()
-        .exchangeStrategies(
-            ExchangeStrategies.builder()
-                // 최대 16MB 메모리 버퍼 제한
-                .codecs { config -> config.defaultCodecs().maxInMemorySize(16 * 1024 * 1024) }
-                .build())
-        .clientConnector(
-            ReactorClientHttpConnector(
-                // Netty HttpClient 설정
-                HttpClient.create()
-                    // 응답 타임아웃 설정
-                    .responseTimeout(Duration.ofSeconds(5))
-                    // 연결 타임아웃 설정
-                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 30 * 1000)
-            )
-        )
-        .build()
     override fun handle(exchange: ServerWebExchange): Mono<Void> {
         val matchedRoute = exchange.attributes[MATCHED_ROUTE_ATTRIBUTE] as? Route
         matchedRoute ?: return handleNoRoute(exchange)
@@ -55,7 +29,7 @@ class FilterHandler : WebHandler {
         )
         log.info { "Forwarding request to: $targetUri" }
 
-        return forwardRequest(exchange, targetUri)
+        return webclient.forwardRequest(exchange, targetUri)
     }
 
     private fun handleNoRoute(exchange: ServerWebExchange): Mono<Void> {
@@ -63,38 +37,6 @@ class FilterHandler : WebHandler {
 
         val message = "No route matched for request: ${exchange.request.uri}"
         return writeTextResponse(exchange, HttpStatus.NOT_FOUND, message)
-    }
-
-    private fun forwardRequest(exchange: ServerWebExchange, targetUri: URI): Mono<Void> {
-        return webClient.method(exchange.request.method)
-            .uri(targetUri)
-            .headers { it.addAll(exchange.request.headers) }
-            .body(exchange.request.body)
-            .exchangeToMono { clientResponse ->
-                exchange.response.statusCode = clientResponse.statusCode()
-                exchange.response.headers.putAll(clientResponse.headers().asHttpHeaders())
-                exchange.response.writeWith(clientResponse.bodyToFlux(DataBuffer::class.java))
-            }
-            .onErrorResume { ex ->
-                when (ex) {
-                    is UnknownHostException -> {
-                        log.error(ex) { "Unknown host: ${targetUri.host}" }
-                        writeTextResponse(exchange, HttpStatus.BAD_GATEWAY, "Unknown host: ${targetUri.host}")
-                    }
-                    is ConnectException -> {
-                        log.error(ex) { "Connection failed to: $targetUri" }
-                        writeTextResponse(exchange, HttpStatus.BAD_GATEWAY, "Connection failed to: $targetUri")
-                    }
-                    is WebClientResponseException -> {
-                        log.error(ex) { "Upstream error: ${ex.message}" }
-                        writeTextResponse(exchange, ex.statusCode, "Upstream error: ${ex.statusText}")
-                    }
-                    else -> {
-                        log.error(ex) { "Unexpected error while forwarding to: $targetUri" }
-                        writeTextResponse(exchange, HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error: ${ex.message}")
-                    }
-                }
-            }
     }
 
     /**

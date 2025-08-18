@@ -14,6 +14,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import com.github.tomakehurst.wiremock.client.WireMock.verify
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
+import dev.jazzybyte.lite.gateway.client.WebFluxHttpClient
 import dev.jazzybyte.lite.gateway.handler.FilterHandler
 import dev.jazzybyte.lite.gateway.handler.GatewayHandlerMapping
 import dev.jazzybyte.lite.gateway.route.HostPredicate
@@ -205,7 +206,7 @@ class GatewayHandlerMappingIntegrationTest {
         }
 
         @Bean
-        fun filterHandler() = FilterHandler()
+        fun filterHandler() = FilterHandler(WebFluxHttpClient())
 
         @Bean
         fun gatewayHandlerMapping(

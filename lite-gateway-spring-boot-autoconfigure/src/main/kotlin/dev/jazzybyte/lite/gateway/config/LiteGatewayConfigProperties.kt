@@ -1,5 +1,6 @@
 package dev.jazzybyte.lite.gateway.config
 
+import dev.jazzybyte.lite.gateway.client.HttpClientProperties
 import dev.jazzybyte.lite.gateway.config.LiteGatewayConfigProperties.Companion.PREFIX
 import dev.jazzybyte.lite.gateway.filter.FilterDefinition
 import dev.jazzybyte.lite.gateway.route.RouteDefinition
@@ -13,7 +14,6 @@ class LiteGatewayConfigProperties {
         const val PREFIX = "lite.gateway"
     }
 
-
     /**
      * 게이트웨이에 적용할 라우트 목록.
      */
@@ -25,4 +25,8 @@ class LiteGatewayConfigProperties {
      * 모든 라우트에 적용되는 필터 정의 목록.
      */
     var defaultFilters = ArrayList<FilterDefinition>()
+
+
+    @field:Valid
+    val httpClient: HttpClientProperties = HttpClientProperties()
 }
