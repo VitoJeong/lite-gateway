@@ -1,7 +1,8 @@
 package dev.jazzybyte.lite.gateway.config
 
-import dev.jazzybyte.lite.gateway.exception.PredicateInstantiationException
 import dev.jazzybyte.lite.gateway.exception.PredicateDiscoveryException
+import dev.jazzybyte.lite.gateway.exception.PredicateInstantiationException
+import dev.jazzybyte.lite.gateway.exception.RouteConfigurationException
 import dev.jazzybyte.lite.gateway.route.CookiePredicate
 import dev.jazzybyte.lite.gateway.route.MethodPredicate
 import dev.jazzybyte.lite.gateway.route.PathPredicate
@@ -383,7 +384,7 @@ class RouteLocatorFactoryTest {
 
             // when & then
             assertThatThrownBy { RouteLocatorFactory.create(routeDefinitions) }
-                .isInstanceOf(dev.jazzybyte.lite.gateway.exception.RouteConfigurationException::class.java)
+                .isInstanceOf(RouteConfigurationException::class.java)
                 .hasMessageContaining("Duplicate order values found in route definitions")
                 .hasMessageContaining("order 1: [route-a, route-b]")
         }
@@ -493,7 +494,7 @@ class RouteLocatorFactoryTest {
 
             // when & then
             assertThatThrownBy { RouteLocatorFactory.create(routeDefinitions) }
-                .isInstanceOf(dev.jazzybyte.lite.gateway.exception.RouteConfigurationException::class.java)
+                .isInstanceOf(RouteConfigurationException::class.java)
                 .hasMessageContaining("Duplicate order values found in route definitions")
                 .hasMessageContaining("order 1: [route-1a, route-1b]")
                 .hasMessageContaining("order 2: [route-2a, route-2b]")
@@ -526,7 +527,7 @@ class RouteLocatorFactoryTest {
 
             // when & then
             assertThatThrownBy { RouteLocatorFactory.create(routeDefinitions) }
-                .isInstanceOf(dev.jazzybyte.lite.gateway.exception.RouteConfigurationException::class.java)
+                .isInstanceOf(RouteConfigurationException::class.java)
                 .hasMessageContaining("Duplicate order values found in route definitions")
                 .hasMessageContaining("order 5: [route-a, route-b, route-c]")
         }

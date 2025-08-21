@@ -14,7 +14,7 @@ class Route(
     private val _predicates: List<RoutePredicate>,
     private var _uri: URI,
     // 라우트의 우선순위, 정수 값이 낮을수록 먼저 처리됨
-    private val _order: Int = Int.MAX_VALUE,
+    private val _order: Int,
 ) {
 
     // 라우트의 고유 식별자
