@@ -2,8 +2,14 @@ package dev.jazzybyte.lite.gateway.config
 
 import dev.jazzybyte.lite.gateway.config.validation.UriValidator
 import dev.jazzybyte.lite.gateway.exception.RouteConfigurationException
+import dev.jazzybyte.lite.gateway.filter.FilterDefinition
 import dev.jazzybyte.lite.gateway.route.PredicateDefinition
 import dev.jazzybyte.lite.gateway.route.RouteDefinition
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.runs
+import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -19,9 +25,12 @@ class RouteBuilderTest {
 
     @BeforeEach
     fun setUp() {
-        predicateRegistry = PredicateRegistry()
-        uriValidator = UriValidator()
+        predicateRegistry = mockk<PredicateRegistry>()
+        uriValidator = mockk<UriValidator>()
         routeBuilder = RouteBuilder(predicateRegistry, uriValidator)
+        
+        // UriValidator의 기본 동작 설정 - 정상적인 URI에 대해서는 예외를 발생시키지 않음
+        every { uriValidator.validateUriFormat(any(), any()) } just runs
     }
 
     @Test
@@ -81,6 +90,9 @@ class RouteBuilderTest {
         }
         
         assertThat(exception.message).contains("Route URI cannot be empty")
+        
+        // verify - UriValidator가 호출되지 않았는지 확인 (빈 URI는 RouteBuilder에서 먼저 검증)
+        verify(exactly = 0) { uriValidator.validateUriFormat(any(), any()) }
     }
 
     @Test
@@ -99,5 +111,58 @@ class RouteBuilderTest {
 
         // then
         assertThat(route.order).isEqualTo(0)
+        
+        // verify - UriValidator가 정상적으로 호출되었는지 확인
+        verify(exactly = 1) { uriValidator.validateUriFormat("http://example.com", "test-route") }
+    }
+
+    @Test
+    @DisplayName("UriValidator에서 예외가 발생하면 RouteConfigurationException으로 래핑되어야 함")
+    fun `should wrap UriValidator exception as RouteConfigurationException`() {
+        // given
+        val routeDefinition = RouteDefinition(
+            id = "test-route",
+            uri = "invalid-uri",
+            predicates = emptyList(),
+            order = 1
+        )
+        
+        // UriValidator가 예외를 발생시키도록 설정
+        every { uriValidator.validateUriFormat("invalid-uri", "test-route") } throws 
+            RouteConfigurationException("Invalid URI format", "test-route")
+
+        // when & then
+        val exception = assertThrows<RouteConfigurationException> {
+            routeBuilder.buildRoute(routeDefinition)
+        }
+        
+        assertThat(exception.message).contains("Invalid URI format")
+        assertThat(exception.routeId).isEqualTo("test-route")
+        
+        // verify - UriValidator가 호출되었는지 확인
+        verify(exactly = 1) { uriValidator.validateUriFormat("invalid-uri", "test-route") }
+    }
+
+    @Test
+    @DisplayName("빈 필터 이름을 가진 RouteDefinition은 검증 실패해야 함")
+    fun `should fail validation for RouteDefinition with empty filter name`() {
+        // given
+        val routeDefinition = RouteDefinition(
+            id = "test-route",
+            uri = "http://example.com",
+            predicates = emptyList(),
+            filters = mutableListOf(
+                FilterDefinition(name = "", args = mapOf("key" to "value"))
+            ),
+            order = 1
+        )
+
+        // when & then
+        val exception = assertThrows<RouteConfigurationException> {
+            routeBuilder.buildRoute(routeDefinition)
+        }
+        
+        assertThat(exception.message).contains("Filter name cannot be empty")
+        assertThat(exception.routeId).isEqualTo("test-route")
     }
 }
