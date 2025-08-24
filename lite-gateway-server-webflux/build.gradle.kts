@@ -30,8 +30,10 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":lite-gateway-core"))
-//    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    api(project(":lite-gateway-core"))
+    api(project(":lite-gateway-spring-boot-autoconfigure"))
+
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     // Kotlinx Serialization 의존성 추가(Jackson 대체)

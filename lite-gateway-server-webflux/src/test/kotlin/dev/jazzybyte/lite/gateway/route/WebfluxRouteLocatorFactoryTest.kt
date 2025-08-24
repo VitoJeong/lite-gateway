@@ -1,14 +1,8 @@
-package dev.jazzybyte.lite.gateway.config
+package dev.jazzybyte.lite.gateway.route
 
 import dev.jazzybyte.lite.gateway.exception.PredicateDiscoveryException
 import dev.jazzybyte.lite.gateway.exception.PredicateInstantiationException
 import dev.jazzybyte.lite.gateway.exception.RouteConfigurationException
-import dev.jazzybyte.lite.gateway.route.CookiePredicate
-import dev.jazzybyte.lite.gateway.route.MethodPredicate
-import dev.jazzybyte.lite.gateway.route.PathPredicate
-import dev.jazzybyte.lite.gateway.route.PredicateDefinition
-import dev.jazzybyte.lite.gateway.route.RouteDefinition
-import dev.jazzybyte.lite.gateway.route.StaticRouteLocator
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.assertj.core.api.Assertions.fail
@@ -26,7 +20,9 @@ import org.junit.jupiter.api.Test
  * - 다양한 설정 조합
  */
 @DisplayName("RouteLocatorFactory 테스트")
-class RouteLocatorFactoryTest {
+class WebfluxRouteLocatorFactoryTest {
+    
+    val routeLocatorFactory = WebfluxRouteLocatorFactory()
 
     @Nested
     @DisplayName("정상적인 라우트 생성")
@@ -48,7 +44,7 @@ class RouteLocatorFactoryTest {
             )
 
             // when
-            val routeLocator = RouteLocatorFactory.create(routeDefinitions)
+            val routeLocator = routeLocatorFactory.create(routeDefinitions)
 
             // then
             assertThat(routeLocator).isInstanceOf(StaticRouteLocator::class.java)
@@ -88,7 +84,7 @@ class RouteLocatorFactoryTest {
             )
 
             // when
-            val routeLocator = RouteLocatorFactory.create(routeDefinitions)
+            val routeLocator = routeLocatorFactory.create(routeDefinitions)
 
             // then
             val staticRouteLocator = routeLocator as StaticRouteLocator
@@ -117,7 +113,7 @@ class RouteLocatorFactoryTest {
             )
 
             // when
-            val routeLocator = RouteLocatorFactory.create(routeDefinitions)
+            val routeLocator = routeLocatorFactory.create(routeDefinitions)
 
             // then
             val staticRouteLocator = routeLocator as StaticRouteLocator
@@ -137,7 +133,7 @@ class RouteLocatorFactoryTest {
             val routeDefinitions = mutableListOf<RouteDefinition>()
 
             // when
-            val routeLocator = RouteLocatorFactory.create(routeDefinitions)
+            val routeLocator = routeLocatorFactory.create(routeDefinitions)
 
             // then
             val staticRouteLocator = routeLocator as StaticRouteLocator
@@ -157,7 +153,7 @@ class RouteLocatorFactoryTest {
             )
 
             // when
-            val routeLocator = RouteLocatorFactory.create(routeDefinitions)
+            val routeLocator = routeLocatorFactory.create(routeDefinitions)
 
             // then
             val staticRouteLocator = routeLocator as StaticRouteLocator
@@ -185,7 +181,7 @@ class RouteLocatorFactoryTest {
             )
 
             // when
-            val routeLocator = RouteLocatorFactory.create(routeDefinitions)
+            val routeLocator = routeLocatorFactory.create(routeDefinitions)
 
             // then
             val staticRouteLocator = routeLocator as StaticRouteLocator
@@ -209,7 +205,7 @@ class RouteLocatorFactoryTest {
             )
 
             // when
-            val routeLocator = RouteLocatorFactory.create(routeDefinitions)
+            val routeLocator = routeLocatorFactory.create(routeDefinitions)
 
             // then
             val staticRouteLocator = routeLocator as StaticRouteLocator
@@ -233,7 +229,7 @@ class RouteLocatorFactoryTest {
             )
 
             // when & then
-            assertThatThrownBy { RouteLocatorFactory.create(routeDefinitions) }
+            assertThatThrownBy { routeLocatorFactory.create(routeDefinitions) }
                 .isInstanceOf(PredicateInstantiationException::class.java)
         }
         @Test
@@ -251,7 +247,7 @@ class RouteLocatorFactoryTest {
             )
 
             // when & then
-            assertThatThrownBy { RouteLocatorFactory.create(routeDefinitions) }
+            assertThatThrownBy { routeLocatorFactory.create(routeDefinitions) }
                 .isInstanceOf(PredicateInstantiationException::class.java)
         }
     }
@@ -275,7 +271,7 @@ class RouteLocatorFactoryTest {
             )
 
             // when & then
-            assertThatThrownBy { RouteLocatorFactory.create(routeDefinitions) }
+            assertThatThrownBy { routeLocatorFactory.create(routeDefinitions) }
                 .isInstanceOf(PredicateDiscoveryException::class.java)
                 .hasMessageContaining("Unknown predicate 'UnknownPredicate'")
                 .hasMessageContaining("route definition with ID 'unknown-predicate-route'")
@@ -298,7 +294,7 @@ class RouteLocatorFactoryTest {
             )
 
             // when & then
-            assertThatThrownBy { RouteLocatorFactory.create(routeDefinitions) }
+            assertThatThrownBy { routeLocatorFactory.create(routeDefinitions) }
                 .isInstanceOf(PredicateInstantiationException::class.java)
                 .hasMessageContaining("Failed to instantiate predicate 'Method' for route 'invalid-args-route'")
                 .hasMessageContaining("Constructor matching failed")
@@ -321,7 +317,7 @@ class RouteLocatorFactoryTest {
 
             // when & then
             try {
-                RouteLocatorFactory.create(routeDefinitions)
+                routeLocatorFactory.create(routeDefinitions)
                 fail("Expected PredicateInstantiationException to be thrown")
             } catch (exception: PredicateInstantiationException) {
                 assertThat(exception.routeId).isEqualTo("detailed-error-route")
@@ -349,7 +345,7 @@ class RouteLocatorFactoryTest {
             )
 
             // when & then
-            assertThatThrownBy { RouteLocatorFactory.create(routeDefinitions) }
+            assertThatThrownBy { routeLocatorFactory.create(routeDefinitions) }
                 .isInstanceOf(PredicateDiscoveryException::class.java)
                 .hasMessageContaining("Unknown predicate ''")
                 .hasMessageContaining("route definition with ID 'null-predicate-route'")
@@ -383,7 +379,7 @@ class RouteLocatorFactoryTest {
             )
 
             // when & then
-            assertThatThrownBy { RouteLocatorFactory.create(routeDefinitions) }
+            assertThatThrownBy { routeLocatorFactory.create(routeDefinitions) }
                 .isInstanceOf(RouteConfigurationException::class.java)
                 .hasMessageContaining("Duplicate order values found in route definitions")
                 .hasMessageContaining("order 1: [route-a, route-b]")
@@ -403,7 +399,7 @@ class RouteLocatorFactoryTest {
             )
 
             // when
-            val routeLocator = RouteLocatorFactory.create(routeDefinitions)
+            val routeLocator = routeLocatorFactory.create(routeDefinitions)
 
             // then
             val staticRouteLocator = routeLocator as StaticRouteLocator
@@ -425,7 +421,7 @@ class RouteLocatorFactoryTest {
             )
 
             // when
-            val routeLocator = RouteLocatorFactory.create(routeDefinitions)
+            val routeLocator = routeLocatorFactory.create(routeDefinitions)
 
             // then
             val staticRouteLocator = routeLocator as StaticRouteLocator
@@ -447,7 +443,7 @@ class RouteLocatorFactoryTest {
             )
 
             // when
-            val routeLocator = RouteLocatorFactory.create(routeDefinitions)
+            val routeLocator = routeLocatorFactory.create(routeDefinitions)
 
             // then
             val staticRouteLocator = routeLocator as StaticRouteLocator
@@ -493,7 +489,7 @@ class RouteLocatorFactoryTest {
             )
 
             // when & then
-            assertThatThrownBy { RouteLocatorFactory.create(routeDefinitions) }
+            assertThatThrownBy { routeLocatorFactory.create(routeDefinitions) }
                 .isInstanceOf(RouteConfigurationException::class.java)
                 .hasMessageContaining("Duplicate order values found in route definitions")
                 .hasMessageContaining("order 1: [route-1a, route-1b]")
@@ -526,7 +522,7 @@ class RouteLocatorFactoryTest {
             )
 
             // when & then
-            assertThatThrownBy { RouteLocatorFactory.create(routeDefinitions) }
+            assertThatThrownBy { routeLocatorFactory.create(routeDefinitions) }
                 .isInstanceOf(RouteConfigurationException::class.java)
                 .hasMessageContaining("Duplicate order values found in route definitions")
                 .hasMessageContaining("order 5: [route-a, route-b, route-c]")
@@ -558,7 +554,7 @@ class RouteLocatorFactoryTest {
             )
 
             // when
-            val routeLocator = RouteLocatorFactory.create(routeDefinitions)
+            val routeLocator = routeLocatorFactory.create(routeDefinitions)
 
             // then - 예외 없이 성공적으로 생성되어야 함
             val staticRouteLocator = routeLocator as StaticRouteLocator

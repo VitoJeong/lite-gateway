@@ -1,11 +1,6 @@
-package dev.jazzybyte.lite.gateway.config
+package dev.jazzybyte.lite.gateway.route
 
 import dev.jazzybyte.lite.gateway.exception.PredicateDiscoveryException
-import dev.jazzybyte.lite.gateway.route.MethodPredicate
-import dev.jazzybyte.lite.gateway.route.PathPredicate
-import dev.jazzybyte.lite.gateway.route.PredicateDefinition
-import dev.jazzybyte.lite.gateway.route.RouteDefinition
-import dev.jazzybyte.lite.gateway.route.StaticRouteLocator
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.DisplayName
@@ -23,6 +18,8 @@ import org.junit.jupiter.api.Test
  */
 @DisplayName("PredicateDiscovery 테스트")
 class PredicateDiscoveryTest {
+    
+    val routeLocatorFactory = WebfluxRouteLocatorFactory()
 
     @Nested
     @DisplayName("Predicate 발견 로직 검증 및 개선")
@@ -43,7 +40,7 @@ class PredicateDiscoveryTest {
             )
 
             // when - 라우트 생성 (Predicate 발견 로직이 실행됨)
-            val routeLocator = RouteLocatorFactory.create(routeDefinitions)
+            val routeLocator = routeLocatorFactory.create(routeDefinitions)
 
             // then - 정상적으로 생성되어야 함 (로깅은 수동으로 확인)
             val staticRouteLocator = routeLocator as StaticRouteLocator
@@ -70,7 +67,7 @@ class PredicateDiscoveryTest {
             )
 
             // when
-            val routeLocator = RouteLocatorFactory.create(routeDefinitions)
+            val routeLocator = routeLocatorFactory.create(routeDefinitions)
 
             // then - 모든 Predicate가 정상적으로 생성되어야 함
             val staticRouteLocator = routeLocator as StaticRouteLocator
@@ -102,7 +99,7 @@ class PredicateDiscoveryTest {
             )
 
             // when & then - 예외 없이 정상적으로 생성되어야 함
-            val routeLocator = RouteLocatorFactory.create(routeDefinitions)
+            val routeLocator = routeLocatorFactory.create(routeDefinitions)
             val staticRouteLocator = routeLocator as StaticRouteLocator
             assertThat(staticRouteLocator.routes).hasSize(1)
         }
@@ -124,7 +121,7 @@ class PredicateDiscoveryTest {
             )
 
             // when
-            val routeLocator = RouteLocatorFactory.create(routeDefinitions)
+            val routeLocator = routeLocatorFactory.create(routeDefinitions)
 
             // then - 각 Predicate가 올바른 클래스로 매핑되어야 함
             val staticRouteLocator = routeLocator as StaticRouteLocator
@@ -151,7 +148,7 @@ class PredicateDiscoveryTest {
             )
 
             // when & then - 중복이 있어도 정상적으로 처리되어야 함 (첫 번째 발견된 클래스 사용)
-            val routeLocator = RouteLocatorFactory.create(routeDefinitions)
+            val routeLocator = routeLocatorFactory.create(routeDefinitions)
             val staticRouteLocator = routeLocator as StaticRouteLocator
             assertThat(staticRouteLocator.routes).hasSize(1)
             assertThat(staticRouteLocator.routes[0].predicates).hasSize(1)
@@ -172,7 +169,7 @@ class PredicateDiscoveryTest {
             )
 
             // when
-            val routeLocator = RouteLocatorFactory.create(routeDefinitions)
+            val routeLocator = routeLocatorFactory.create(routeDefinitions)
 
             // then - 패키지 스캔이 성공적으로 수행되고 Predicate가 발견되어야 함
             val staticRouteLocator = routeLocator as StaticRouteLocator
@@ -204,7 +201,7 @@ class PredicateDiscoveryTest {
             )
 
             // when & then - 대소문자 구분으로 인해 실패해야 함
-            assertThatThrownBy { RouteLocatorFactory.create(routeDefinitions) }
+            assertThatThrownBy { routeLocatorFactory.create(routeDefinitions) }
                 .isInstanceOf(PredicateDiscoveryException::class.java)
                 .hasMessageContaining("Unknown predicate 'path'")
                 .hasMessageContaining("Available predicates:")
@@ -225,7 +222,7 @@ class PredicateDiscoveryTest {
             )
 
             // when & then - 공백이 포함된 이름으로 인해 실패해야 함
-            assertThatThrownBy { RouteLocatorFactory.create(routeDefinitions) }
+            assertThatThrownBy { routeLocatorFactory.create(routeDefinitions) }
                 .isInstanceOf(PredicateDiscoveryException::class.java)
                 .hasMessageContaining("Unknown predicate ' Path '")
                 .hasMessageContaining("Available predicates:")
@@ -248,7 +245,7 @@ class PredicateDiscoveryTest {
             )
 
             // when
-            val routeLocator = RouteLocatorFactory.create(routeDefinitions)
+            val routeLocator = routeLocatorFactory.create(routeDefinitions)
 
             // then
             val staticRouteLocator = routeLocator as StaticRouteLocator
@@ -280,7 +277,7 @@ class PredicateDiscoveryTest {
             )
 
             // when
-            val routeLocator = RouteLocatorFactory.create(routeDefinitions)
+            val routeLocator = routeLocatorFactory.create(routeDefinitions)
 
             // then
             val staticRouteLocator = routeLocator as StaticRouteLocator

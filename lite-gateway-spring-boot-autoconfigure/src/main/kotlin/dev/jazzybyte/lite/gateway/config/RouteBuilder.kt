@@ -5,21 +5,73 @@ import dev.jazzybyte.lite.gateway.exception.PredicateDiscoveryException
 import dev.jazzybyte.lite.gateway.exception.PredicateInstantiationException
 import dev.jazzybyte.lite.gateway.exception.RouteConfigurationException
 import dev.jazzybyte.lite.gateway.predicate.RoutePredicate
+import dev.jazzybyte.lite.gateway.route.PredicateDefinition
 import dev.jazzybyte.lite.gateway.route.Route
 import dev.jazzybyte.lite.gateway.route.RouteDefinition
 import dev.jazzybyte.lite.gateway.util.ReflectionUtil
 import io.github.oshai.kotlinlogging.KotlinLogging
+import java.util.concurrent.ConcurrentHashMap
 
 private val log = KotlinLogging.logger {}
 
 /**
  * 라우트 생성 로직을 담당하는 클래스입니다.
  * RouteDefinition을 Route 객체로 변환하고 관련 검증을 수행합니다.
+ * 
+ * 성능 최적화:
+ * - Predicate 인스턴스 캐싱으로 동일한 설정의 Predicate 재사용
+ * - 메모리 효율적인 데이터 구조 사용
  */
 class RouteBuilder(
     private val predicateRegistry: PredicateRegistry,
     private val uriValidator: UriValidator
 ) {
+    
+    // Predicate instance caching for performance optimization
+    // Key: "PredicateName:args" (e.g., "Path:/api/**")
+    private val predicateInstanceCache = ConcurrentHashMap<String, RoutePredicate>()
+    
+    companion object {
+        // Cache statistics for monitoring
+        private var cacheHits = 0L
+        private var cacheMisses = 0L
+        
+        /**
+         * Get cache performance statistics
+         */
+        fun getCacheStatistics(): Map<String, Any> {
+            val totalRequests = cacheHits + cacheMisses
+            val hitRate = if (totalRequests > 0) (cacheHits.toDouble() / totalRequests * 100) else 0.0
+            
+            return mapOf(
+                "cacheHits" to cacheHits,
+                "cacheMisses" to cacheMisses,
+                "totalRequests" to totalRequests,
+                "hitRate" to "%.2f%%".format(hitRate)
+            )
+        }
+        
+        /**
+         * Reset cache statistics - useful for testing
+         */
+        fun resetCacheStatistics() {
+            cacheHits = 0L
+            cacheMisses = 0L
+        }
+    }
+    
+    /**
+     * Clear predicate instance cache - useful for testing or memory management
+     */
+    fun clearPredicateCache() {
+        predicateInstanceCache.clear()
+        log.debug { "Predicate instance cache cleared" }
+    }
+    
+    /**
+     * Get current cache size
+     */
+    fun getCacheSize(): Int = predicateInstanceCache.size
 
     /**
      * RouteDefinition을 Route 객체로 변환합니다.
@@ -78,42 +130,80 @@ class RouteBuilder(
 
     /**
      * RouteDefinition으로부터 Predicate 인스턴스들을 생성합니다.
+     * 성능 최적화를 위해 동일한 설정의 Predicate는 캐시에서 재사용합니다.
      */
     private fun createPredicates(def: RouteDefinition): List<RoutePredicate> {
         return def.predicates.map { predicateDef ->
-            // 빈 Predicate 이름 검증
-            if (predicateDef.name.isBlank()) {
-                throw PredicateDiscoveryException(
-                    message = "Unknown predicate '${predicateDef.name}' in route definition with ID '${def.id}'. " +
-                            "Available predicates: ${predicateRegistry.getAvailablePredicateNames()}",
-                    predicateName = predicateDef.name
-                )
-            }
-            
-            val predicateClass = predicateRegistry.getPredicateClass(predicateDef.name)
-                ?: throw PredicateDiscoveryException(
-                    message = "Unknown predicate '${predicateDef.name}' in route definition with ID '${def.id}'. " +
-                            "Available predicates: ${predicateRegistry.getAvailablePredicateNames()}",
-                    predicateName = predicateDef.name
-                )
-
-            try {
-                // 배열이 하나일 경우 String으로 변환
-                if (predicateDef.parsedArgs.size == 1) {
-                    ReflectionUtil.createInstanceOfType(predicateClass, predicateDef.parsedArgs[0])
-                } else {
-                    ReflectionUtil.createInstanceOfType(predicateClass, *predicateDef.parsedArgs)
-                }
-            } catch (e: Exception) {
-                handlePredicateInstantiationError(
-                    e,
-                    def.id,
-                    predicateDef.name,
-                    predicateClass,
-                    predicateDef.parsedArgs
-                )
-            }
+            createSinglePredicate(def.id, predicateDef)
         }
+    }
+    
+    /**
+     * 단일 Predicate 인스턴스를 생성하거나 캐시에서 가져옵니다.
+     */
+    private fun createSinglePredicate(routeId: String, predicateDef: PredicateDefinition): RoutePredicate {
+        // 빈 Predicate 이름 검증
+        if (predicateDef.name.isBlank()) {
+            throw PredicateDiscoveryException(
+                message = "Unknown predicate '${predicateDef.name}' in route definition with ID '$routeId'. " +
+                        "Available predicates: ${predicateRegistry.getAvailablePredicateNames()}",
+                predicateName = predicateDef.name
+            )
+        }
+        
+        val predicateClass = predicateRegistry.getPredicateClass(predicateDef.name)
+            ?: throw PredicateDiscoveryException(
+                message = "Unknown predicate '${predicateDef.name}' in route definition with ID '$routeId'. " +
+                        "Available predicates: ${predicateRegistry.getAvailablePredicateNames()}",
+                predicateName = predicateDef.name
+            )
+
+        // Create cache key based on predicate name and arguments
+        val cacheKey = createPredicateCacheKey(predicateDef)
+        
+        // Try to get from cache first
+        val cachedPredicate = predicateInstanceCache[cacheKey]
+        if (cachedPredicate != null) {
+            cacheHits++
+            log.debug { "Cache hit for predicate: $cacheKey" }
+            return cachedPredicate
+        }
+        
+        // Cache miss - create new instance
+        cacheMisses++
+        log.debug { "Cache miss for predicate: $cacheKey" }
+        
+        val predicate = try {
+            // 배열이 하나일 경우 String으로 변환
+            if (predicateDef.parsedArgs.size == 1) {
+                ReflectionUtil.createInstanceOfType(predicateClass, predicateDef.parsedArgs[0])
+            } else {
+                ReflectionUtil.createInstanceOfType(predicateClass, *predicateDef.parsedArgs)
+            }
+        } catch (e: Exception) {
+            handlePredicateInstantiationError(
+                e,
+                routeId,
+                predicateDef.name,
+                predicateClass,
+                predicateDef.parsedArgs
+            )
+        }
+        
+        // Cache the created instance for future use
+        predicateInstanceCache[cacheKey] = predicate
+        log.debug { "Cached new predicate instance: $cacheKey" }
+        
+        return predicate
+    }
+    
+    /**
+     * Predicate 캐시 키를 생성합니다.
+     * 형식: "PredicateName:arg1,arg2,..."
+     */
+    private fun createPredicateCacheKey(predicateDef: PredicateDefinition): String {
+        val argsString = predicateDef.parsedArgs.joinToString(",")
+        return "${predicateDef.name}:$argsString"
     }
 
     /**

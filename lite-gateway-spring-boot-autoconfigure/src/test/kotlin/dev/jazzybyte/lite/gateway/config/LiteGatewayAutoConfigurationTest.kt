@@ -1,17 +1,9 @@
 package dev.jazzybyte.lite.gateway.config
 
-import dev.jazzybyte.lite.gateway.context.ServerWebExchangeRequestContext
-import dev.jazzybyte.lite.gateway.handler.FilterHandler
-import dev.jazzybyte.lite.gateway.handler.GatewayHandlerMapping
-import dev.jazzybyte.lite.gateway.route.PathPredicate
-import dev.jazzybyte.lite.gateway.route.StaticRouteLocator
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.boot.autoconfigure.AutoConfigurations
 import org.springframework.boot.test.context.runner.ReactiveWebApplicationContextRunner
-import org.springframework.mock.http.server.reactive.MockServerHttpRequest
-import org.springframework.mock.web.server.MockServerWebExchange
-import kotlin.test.assertTrue
 
 /**
  * [LiteGatewayAutoConfiguration]에 대한 테스트 클래스.
@@ -64,46 +56,4 @@ class LiteGatewayAutoConfigurationTest {
             }
     }
 
-    @Test
-    fun `route properties are correctly bound to ConfigProperties object`() {
-        // given: test route information set as properties
-        contextRunner
-            .withPropertyValues(
-                "lite.gateway.routes[0].id=test-route",
-                "lite.gateway.routes[0].uri=http://example.com",
-                "lite.gateway.routes[0].predicates[0].name=Path",
-                "lite.gateway.routes[0].predicates[0].args=/foo/**",
-            )
-            .run { context ->
-                // when: context is loaded
-
-                // then: verify that properties are correctly set in ConfigProperties bean.
-                assertThat(context).hasSingleBean(LiteGatewayConfigProperties::class.java)
-                val properties = context.getBean(LiteGatewayConfigProperties::class.java)
-
-                assertThat(properties.routes).hasSize(1)
-                val route = properties.routes[0]
-                assertThat(route.id).isEqualTo("test-route")
-                assertThat(route.uri).isEqualTo("http://example.com")
-
-
-                // and: verify that StaticRouteLocator is correctly registered
-                assertThat(context).hasSingleBean(StaticRouteLocator::class.java)
-                val routeLocator = context.getBean(StaticRouteLocator::class.java)
-                assertThat(routeLocator.routes).hasSize(1)
-                val registeredRoute = routeLocator.routes.first()
-                assertThat(registeredRoute.predicates).hasSize(1)
-                assertTrue { registeredRoute.predicates[0] is PathPredicate }
-                val pathPredicate = registeredRoute.predicates[0] as PathPredicate
-
-                val serverWebExchange = MockServerWebExchange.from(
-                    MockServerHttpRequest.get("http://test.com/foo/1")
-                )
-                assertTrue { pathPredicate.matches(ServerWebExchangeRequestContext(serverWebExchange)) }
-
-                assertThat(context).hasSingleBean(FilterHandler::class.java)
-                assertThat(context).hasSingleBean(GatewayHandlerMapping::class.java)
-
-            }
-    }
 }

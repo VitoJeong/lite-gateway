@@ -32,7 +32,6 @@ repositories {
 
 dependencies {
     api(project(":lite-gateway-core"))
-    api(project(":lite-gateway-server-webflux"))
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")

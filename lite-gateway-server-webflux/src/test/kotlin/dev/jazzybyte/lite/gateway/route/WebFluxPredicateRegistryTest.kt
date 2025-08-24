@@ -1,5 +1,6 @@
-package dev.jazzybyte.lite.gateway.config
+package dev.jazzybyte.lite.gateway.route
 
+import dev.jazzybyte.lite.gateway.config.PredicateRegistry
 import dev.jazzybyte.lite.gateway.predicate.RoutePredicate
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -7,7 +8,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
 @DisplayName("PredicateRegistry 테스트")
-class PredicateRegistryTest {
+class WebFluxPredicateRegistryTest {
 
     private lateinit var predicateRegistry: PredicateRegistry
 

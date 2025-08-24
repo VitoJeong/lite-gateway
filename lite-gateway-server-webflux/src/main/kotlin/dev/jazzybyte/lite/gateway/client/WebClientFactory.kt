@@ -1,7 +1,4 @@
-package dev.jazzybyte.lite.gateway.config
-
-import dev.jazzybyte.lite.gateway.client.HttpClientProperties
-import dev.jazzybyte.lite.gateway.client.WebFluxHttpClient
+package dev.jazzybyte.lite.gateway.client
 
 class WebClientFactory {
     companion object {
