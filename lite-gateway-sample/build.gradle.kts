@@ -31,12 +31,14 @@ repositories {
 }
 
 dependencies {
-    api(project(":lite-gateway-spring-boot-autoconfigure"))
+    api(project(":lite-gateway-server-webflux"))
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
+//    implementation("org.springframework.boot:spring-boot-starter-actuator")
+//    implementation("io.micrometer:micrometer-registry-prometheus")
 
     implementation("io.github.oshai:kotlin-logging-jvm:5.1.1")
     implementation("org.apache.logging.log4j:log4j-api:2.20.0")

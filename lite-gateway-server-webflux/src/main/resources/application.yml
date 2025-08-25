@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: lite-gateway-spring-boot-autoconfigure
+logging:
+  level:
+    root: debug

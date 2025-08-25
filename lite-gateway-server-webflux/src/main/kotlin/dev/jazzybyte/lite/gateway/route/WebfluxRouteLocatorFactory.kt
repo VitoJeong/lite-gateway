@@ -31,15 +31,15 @@ class WebfluxRouteLocatorFactory : RouteLocatorFactory {
     /**
      * RouteDefinition 목록으로부터 RouteLocator를 생성합니다.
      */
-    override fun create(routeDefinitions: @NotNull @Valid MutableList<RouteDefinition>): RouteLocator {
+    override fun create(routesDefinitions: @NotNull @Valid MutableList<RouteDefinition>): RouteLocator {
         val startTime = System.currentTimeMillis()
-        log.info { "Starting route creation process for ${routeDefinitions.size} route definitions" }
+        log.info { "Starting route creation process for ${routesDefinitions.size} route definitions" }
 
-        val routes = createRoutes(routeDefinitions)
+        val routes = createRoutes(routesDefinitions)
             .sortedBy { it.order }
 
         // 중복 order 값 검증
-        validateRouteOrders(routeDefinitions)
+        validateRouteOrders(routesDefinitions)
 
         val totalCreationTime = System.currentTimeMillis() - startTime
         logRouteCreationCompletion(routes, totalCreationTime)
