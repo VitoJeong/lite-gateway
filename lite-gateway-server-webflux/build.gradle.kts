@@ -33,7 +33,10 @@ dependencies {
     api(project(":lite-gateway-core"))
     api(project(":lite-gateway-spring-boot-autoconfigure"))
 
+    // 관측 스택 의존성 추가 (Actuator + Micrometer + Prometheus)
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("io.micrometer:micrometer-registry-prometheus")
+
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     // Kotlinx Serialization 의존성 추가(Jackson 대체)
