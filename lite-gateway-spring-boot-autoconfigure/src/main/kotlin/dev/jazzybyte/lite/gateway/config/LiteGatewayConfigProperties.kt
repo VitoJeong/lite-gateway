@@ -7,7 +7,9 @@ import dev.jazzybyte.lite.gateway.route.RouteDefinition
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotNull
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.validation.annotation.Validated
 
+@Validated
 @ConfigurationProperties(prefix = PREFIX)
 class LiteGatewayConfigProperties {
     companion object {
@@ -24,6 +26,7 @@ class LiteGatewayConfigProperties {
     /**
      * 모든 라우트에 적용되는 필터 정의 목록.
      */
+    @field:Valid
     var defaultFilters = ArrayList<FilterDefinition>()
 
 
