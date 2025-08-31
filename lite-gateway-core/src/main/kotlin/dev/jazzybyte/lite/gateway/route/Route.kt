@@ -1,5 +1,6 @@
 package dev.jazzybyte.lite.gateway.route
 
+import dev.jazzybyte.lite.gateway.filter.GatewayFilter
 import dev.jazzybyte.lite.gateway.predicate.RoutePredicate
 import java.net.URI
 
@@ -15,13 +16,16 @@ class Route(
     private var _uri: URI,
     // 라우트의 우선순위, 정수 값이 낮을수록 먼저 처리됨
     private val _order: Int,
+    private val _filters: List<GatewayFilter>,
 ) {
 
     // 라우트의 고유 식별자
-    val id: String get() = _id
+    val id: String
+        get() = _id
 
     // 라우트에 정의된 조건 목록
-    val predicates: List<RoutePredicate> get() = _predicates
+    val predicates: List<RoutePredicate>
+        get() = _predicates
 
     // 라우트가 가리키는 URI
     var uri: URI
@@ -31,7 +35,11 @@ class Route(
         }
 
     // 라우트의 우선순위
-    val order: Int get() = _order
+    val order: Int
+        get() = _order
+
+    val filters: List<GatewayFilter>
+        get() = _filters
 
     init {
         // URI가 null이거나 비어있는 경우 예외 발생
@@ -66,14 +74,14 @@ class Route(
         uri: String,
         predicate: RoutePredicate,
         order: Int = Int.MAX_VALUE,
-    ) : this(id, listOf(predicate), createUriWithIdnSupport(uri), order)
+    ) : this(id, listOf(predicate), createUriWithIdnSupport(uri), order, emptyList())
 
     constructor(
         id: String,
         uri: String,
         predicates: List<RoutePredicate>,
         order: Int = Int.MAX_VALUE,
-    ) : this(id, predicates, createUriWithIdnSupport(uri), order)
+    ) : this(id, predicates, createUriWithIdnSupport(uri), order, emptyList())
 
     companion object {
         /**
@@ -131,6 +139,7 @@ class Route(
         if (_id != other._id) return false
         if (_predicates != other._predicates) return false
         if (_uri != other._uri) return false
+        if (_filters != other._filters) return false
 
         return true
     }
@@ -140,6 +149,7 @@ class Route(
         result = 31 * result + _id.hashCode()
         result = 31 * result + _predicates.hashCode()
         result = 31 * result + _uri.hashCode()
+        result = 31 * result + _filters.hashCode()
         return result
     }
 
