@@ -1,14 +1,11 @@
 package dev.jazzybyte.lite.gateway.route
 
-import dev.jazzybyte.lite.gateway.filter.GatewayFilter
+import dev.jazzybyte.lite.gateway.filter.core.GatewayFilter
 import dev.jazzybyte.lite.gateway.predicate.RoutePredicate
 import java.net.URI
 
 /**
  * 정의된 라우팅 정보
- *
- * @property id The unique identifier for the route.
- * @property uri The URI to which the route points.
  */
 class Route(
     private val _id: String,
