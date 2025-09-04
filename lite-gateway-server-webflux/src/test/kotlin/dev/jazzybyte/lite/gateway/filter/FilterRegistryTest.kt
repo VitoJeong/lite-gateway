@@ -1,6 +1,7 @@
 package dev.jazzybyte.lite.gateway.filter
 
 import dev.jazzybyte.lite.gateway.config.FilterRegistry
+import dev.jazzybyte.lite.gateway.filter.core.GatewayFilter
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName

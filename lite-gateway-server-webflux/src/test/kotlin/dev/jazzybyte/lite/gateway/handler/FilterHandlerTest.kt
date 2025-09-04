@@ -42,6 +42,6 @@ class FilterHandlerTest {
     class TestConfig {
 
         @Bean
-        fun filterHandler() = FilterHandler(WebFluxHttpClient())
+        fun filterHandler() = FilterHandler(WebFluxHttpClient(), emptyList())
     }
 }

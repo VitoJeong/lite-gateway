@@ -206,7 +206,7 @@ class GatewayHandlerMappingIntegrationTest {
         }
 
         @Bean
-        fun filterHandler() = FilterHandler(WebFluxHttpClient())
+        fun filterHandler() = FilterHandler(WebFluxHttpClient(), emptyList())
 
         @Bean
         fun gatewayHandlerMapping(

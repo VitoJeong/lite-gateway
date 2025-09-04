@@ -7,6 +7,9 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
+import dev.jazzybyte.lite.gateway.filter.GatewayFilterFactory
+import io.mockk.mockk
+
 /**
  * RouteLocatorFactory의 Predicate 발견 로직에 대한 전용 테스트
  * 
@@ -19,7 +22,8 @@ import org.junit.jupiter.api.Test
 @DisplayName("PredicateDiscovery 테스트")
 class PredicateDiscoveryTest {
     
-    val routeLocatorFactory = WebfluxRouteLocatorFactory()
+    val gatewayFilterFactory = mockk<GatewayFilterFactory>()
+    val routeLocatorFactory = WebfluxRouteLocatorFactory(gatewayFilterFactory)
 
     @Nested
     @DisplayName("Predicate 발견 로직 검증 및 개선")

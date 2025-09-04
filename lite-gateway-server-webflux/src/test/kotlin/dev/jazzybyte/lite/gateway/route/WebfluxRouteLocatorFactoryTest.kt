@@ -10,6 +10,9 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
+import dev.jazzybyte.lite.gateway.filter.GatewayFilterFactory
+import io.mockk.mockk
+
 /**
  * RouteLocatorFactory에 대한 포괄적인 단위 테스트
  * 
@@ -22,7 +25,8 @@ import org.junit.jupiter.api.Test
 @DisplayName("RouteLocatorFactory 테스트")
 class WebfluxRouteLocatorFactoryTest {
     
-    val routeLocatorFactory = WebfluxRouteLocatorFactory()
+    val gatewayFilterFactory = mockk<GatewayFilterFactory>()
+    val routeLocatorFactory = WebfluxRouteLocatorFactory(gatewayFilterFactory)
 
     @Nested
     @DisplayName("정상적인 라우트 생성")
