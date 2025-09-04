@@ -1,7 +1,7 @@
 package dev.jazzybyte.lite.gateway.config
 
 import dev.jazzybyte.lite.gateway.exception.FilterDiscoveryException
-import dev.jazzybyte.lite.gateway.filter.GatewayFilter
+import dev.jazzybyte.lite.gateway.filter.core.GatewayFilter
 import dev.jazzybyte.lite.gateway.util.ReflectionUtil
 import io.github.oshai.kotlinlogging.KotlinLogging
 
@@ -135,7 +135,7 @@ class FilterRegistry {
         val duplicateNames = mutableSetOf<String>()
 
         discoveredClasses.forEach { filterClass ->
-            val filterName = filterClass.simpleName.removeSuffix("GatewayFilter")
+            val filterName = filterClass.simpleName.removeSuffix("Filter")
 
             if (filterName.isBlank()) {
                 throw FilterDiscoveryException(

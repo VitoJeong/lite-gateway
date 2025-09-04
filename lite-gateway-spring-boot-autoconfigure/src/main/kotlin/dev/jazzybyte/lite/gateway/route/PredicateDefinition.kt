@@ -10,7 +10,7 @@ import org.springframework.validation.annotation.Validated
 @Validated
 data class PredicateDefinition(
     @field:NotBlank(message = "비어 있을 수 없습니다")
-    val name: String,
+    val name: String, // TODO: 변수명 변경 type
     // ConfigurationProperties가 바인딩할 대상
     val args: String? = null
 ) {

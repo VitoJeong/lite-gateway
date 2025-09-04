@@ -27,7 +27,7 @@ class LiteGatewayConfigProperties {
      * 모든 라우트에 적용되는 필터 정의 목록.
      */
     @field:Valid
-    var defaultFilters = ArrayList<FilterDefinition>()
+    var globalFilters = ArrayList<FilterDefinition>()
 
 
     @field:Valid
