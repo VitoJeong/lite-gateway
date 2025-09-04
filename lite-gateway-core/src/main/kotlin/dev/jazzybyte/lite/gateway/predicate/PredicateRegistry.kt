@@ -1,7 +1,6 @@
-package dev.jazzybyte.lite.gateway.config
+package dev.jazzybyte.lite.gateway.predicate
 
 import dev.jazzybyte.lite.gateway.exception.PredicateDiscoveryException
-import dev.jazzybyte.lite.gateway.predicate.RoutePredicate
 import dev.jazzybyte.lite.gateway.util.ReflectionUtil
 import io.github.oshai.kotlinlogging.KotlinLogging
 
