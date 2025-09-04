@@ -32,6 +32,7 @@ repositories {
 
 dependencies {
     api(project(":lite-gateway-core"))
+    testImplementation(project(":lite-gateway-core"))
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")

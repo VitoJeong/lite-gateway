@@ -7,6 +7,8 @@ plugins {
     // -> 동적으로 annotation processor를 실행하고, 생성된 코드를 컴파일할 수 있다.
     kotlin("kapt") version "2.1.21"
 
+    id("org.springframework.boot") version "3.3.12"
+    id("io.spring.dependency-management") version "1.1.7"
 }
 
 group = "dev.jazzybyte"
@@ -28,6 +30,7 @@ repositories {
 }
 
 dependencies {
+    implementation("org.springframework.boot:spring-boot-starter-validation")
     // Kotlinx Serialization 의존성 추가(Jackson 대체)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.2.3")
@@ -40,6 +43,7 @@ dependencies {
     implementation("io.github.classgraph:classgraph:4.8.179")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     // KotlinFixture (data class 자동 생성)
     testImplementation("com.appmattus.fixture:fixture:1.2.0")
