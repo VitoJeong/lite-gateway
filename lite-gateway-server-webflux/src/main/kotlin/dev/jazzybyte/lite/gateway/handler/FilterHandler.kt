@@ -1,6 +1,10 @@
 package dev.jazzybyte.lite.gateway.handler
 
 import dev.jazzybyte.lite.gateway.client.WebFluxHttpClient
+import dev.jazzybyte.lite.gateway.context.webflux.WebFluxGatewayContext
+import dev.jazzybyte.lite.gateway.filter.core.GatewayContext
+import dev.jazzybyte.lite.gateway.filter.core.GatewayFilter
+import dev.jazzybyte.lite.gateway.filter.webflux.DefaultGatewayFilterChain
 import dev.jazzybyte.lite.gateway.handler.GatewayHandlerMapping.Companion.MATCHED_ROUTE_ATTRIBUTE
 import dev.jazzybyte.lite.gateway.route.Route
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -17,19 +21,33 @@ import java.nio.charset.StandardCharsets
 private val log = KotlinLogging.logger {}
 
 class FilterHandler(
-    private val webclient: WebFluxHttpClient
+    private val webclient: WebFluxHttpClient,
+    private val globalFilters: List<GatewayFilter> // GlobalFilter 주입
 ) : WebHandler {
 
     override fun handle(exchange: ServerWebExchange): Mono<Void> {
         val matchedRoute = exchange.attributes[MATCHED_ROUTE_ATTRIBUTE] as? Route
-        matchedRoute ?: return handleNoRoute(exchange)
+            ?: return handleNoRoute(exchange)
 
-        val targetUri = matchedRoute.uri.resolve(
-            exchange.request.uri.path + buildQueryString(exchange.request)
-        )
-        log.info { "Forwarding request to: $targetUri" }
+        // 1. GlobalFilter와 RouteFilter를 합친다.
+        val allFilters = (globalFilters + matchedRoute.filters).distinct()
 
-        return webclient.forwardRequest(exchange, targetUri)
+        // 2. WebFluxGatewayContext 어댑터를 생성한다.
+        val gatewayContext = WebFluxGatewayContext(exchange, matchedRoute)
+
+        // 3. 모든 필터가 실행된 후 수행될 최종 액션 (프록시 요청) 정의
+        val finalAction: (GatewayContext) -> Mono<Void> = { ctx ->
+            val webfluxContext = ctx as WebFluxGatewayContext // 실제 exchange에 접근하기 위해 다운캐스팅
+            val targetUri = matchedRoute.uri.resolve(
+                webfluxContext.exchange.request.uri.path + buildQueryString(webfluxContext.exchange.request)
+            )
+            log.info { "Forwarding request to: $targetUri" }
+            webclient.forwardRequest(webfluxContext.exchange, targetUri)
+        }
+
+        // 4. 필터 체인을 생성하고 실행한다.
+        val chain = DefaultGatewayFilterChain(allFilters, finalAction)
+        return chain.filter(gatewayContext)
     }
 
     private fun handleNoRoute(exchange: ServerWebExchange): Mono<Void> {
@@ -55,7 +73,7 @@ class FilterHandler(
     }
 
     /**
-     * 요청의 쿼리 파라미터를 URL 인코딩하여 쿼리 문자열로 변환합니다.
+     * 요청의 쿼리 파라미터를 URL 인코딩하여 쿼리 문자열로 변환
      */
     private fun buildQueryString(request: ServerHttpRequest): String {
         val queryParams = request.queryParams
