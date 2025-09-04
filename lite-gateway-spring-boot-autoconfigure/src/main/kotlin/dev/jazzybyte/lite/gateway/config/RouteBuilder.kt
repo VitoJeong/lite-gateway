@@ -4,6 +4,8 @@ import dev.jazzybyte.lite.gateway.config.validation.UriValidator
 import dev.jazzybyte.lite.gateway.exception.PredicateDiscoveryException
 import dev.jazzybyte.lite.gateway.exception.PredicateInstantiationException
 import dev.jazzybyte.lite.gateway.exception.RouteConfigurationException
+import dev.jazzybyte.lite.gateway.filter.GatewayFilterFactory
+import dev.jazzybyte.lite.gateway.predicate.PredicateRegistry
 import dev.jazzybyte.lite.gateway.predicate.RoutePredicate
 import dev.jazzybyte.lite.gateway.route.PredicateDefinition
 import dev.jazzybyte.lite.gateway.route.Route
@@ -11,6 +13,8 @@ import dev.jazzybyte.lite.gateway.route.RouteDefinition
 import dev.jazzybyte.lite.gateway.util.ReflectionUtil
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.util.concurrent.ConcurrentHashMap
+
+import java.net.URI
 
 private val log = KotlinLogging.logger {}
 
@@ -24,7 +28,8 @@ private val log = KotlinLogging.logger {}
  */
 class RouteBuilder(
     private val predicateRegistry: PredicateRegistry,
-    private val uriValidator: UriValidator
+    private val uriValidator: UriValidator,
+    private val gatewayFilterFactory: GatewayFilterFactory // Add this dependency
 ) {
     
     // Predicate instance caching for performance optimization
@@ -83,13 +88,19 @@ class RouteBuilder(
         // Predicate 인스턴스 생성
         val predicates = createPredicates(def)
 
+        // Filter 인스턴스 생성
+        val filters = def.filters.map { filterDef ->
+            gatewayFilterFactory.create(filterDef)
+        }
+
         // Route 객체 생성
         val order = validateAndNormalizeOrder(def.id, def.order)
         return Route(
-            id = def.id,
-            uri = def.uri.toString(),
-            order = order,
-            predicates = predicates
+            _id = def.id,
+            _uri = URI.create(def.uri.toString()),
+            _order = order,
+            _predicates = predicates,
+            _filters = filters // Pass the created filters
         )
     }
 
@@ -114,7 +125,7 @@ class RouteBuilder(
 
         // Filter 정의 검증
         def.filters.forEachIndexed { index, filterDef ->
-            if (filterDef.name.isBlank()) {
+            if (filterDef.type.isBlank()) {
                 throw RouteConfigurationException(
                     message = "Filter name cannot be empty or blank at index $index",
                     routeId = def.id
