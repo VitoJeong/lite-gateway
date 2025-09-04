@@ -8,17 +8,68 @@ lite:
       - id: test-route
         uri: https://httpbin.org
         predicates:
-          - name: Method
-            args: GET
+          - name: Path
+            args: /status/{code:\d+}
         order: 1
       - id: mock1
         uri: http://localhost:18080
         predicates:
           - name: Path
-            args: /mock1/ok
+            args: /mock1/**
         order: 2
+      - id: mock2
+        uri: http://localhost:18081
+        predicates:
+          - name: Path
+            args: /mock2/**
+        order: 3
 
+# Spring Boot Actuator 설정
+management:
+  server:
+    port: 9090
+  endpoints:
+    web:
+      exposure:
+        # 모든 actuator 엔드포인트 노출 (개발 환경용)
+        include: "*"
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  # Prometheus 설정 (Spring Boot 3.3에서 변경됨)
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  metrics:
+    # JVM 메트릭 활성화
+    jvm:
+      enabled: true
+    # 시스템 메트릭 활성화 (CPU, 메모리 등)
+    system:
+      enabled: true
+    # Netty 메트릭 활성화
+    netty:
+      enabled: true
+    # WebFlux 메트릭 활성화 (autotime 설정 제거 - 3.3에서는 자동으로 적용됨)
+    web:
+      server:
+        request:
+          # 요청 시간 측정은 이제 자동으로 수행됨
+    tags:
+      application: ${spring.application.name}
+      environment: development
 logging:
   level:
     root: info
     lite.gateway: debug
+    # Actuator 관련 로깅
+    org.springframework.boot.actuate: debug
+    # Netty 관련 로깅 (필요시)
+    reactor.netty: info
