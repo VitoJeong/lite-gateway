@@ -9,12 +9,15 @@ import org.springframework.boot.context.properties.bind.validation.BindValidatio
 import org.springframework.boot.test.context.runner.ApplicationContextRunner
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor
 
+import org.springframework.boot.autoconfigure.SpringBootApplication
+
 @DisplayName("FilterDefinition @ConfigurationProperties 바인딩 테스트")
 class FilterDefinitionPropertiesTest {
 
     private val contextRunner = ApplicationContextRunner()
         .withUserConfiguration(TestConfig::class.java)
 
+    @SpringBootApplication
     @EnableConfigurationProperties(LiteGatewayConfigProperties::class)
     class TestConfig {
         fun methodValidationPostProcessor(): MethodValidationPostProcessor = MethodValidationPostProcessor()
@@ -27,9 +30,8 @@ class FilterDefinitionPropertiesTest {
             .withPropertyValues(
                 "lite.gateway.routes[0].id=test-route",
                 "lite.gateway.routes[0].uri=http://localhost:8080",
-                "lite.gateway.routes[0].filters[0].name=AddRequestHeader",
-                "lite.gateway.routes[0].filters[0].args.headerName=X-Test",
-                "lite.gateway.routes[0].filters[0].args.headerValue=true"
+                "lite.gateway.routes[0].filters[0].type=AddRequestHeader",
+                "lite.gateway.routes[0].filters[0].args.X-Test=test-value",
             )
             .run { context ->
                 assertThat(context).hasNotFailed()
@@ -38,8 +40,8 @@ class FilterDefinitionPropertiesTest {
                 val route = properties.routes[0]
                 assertThat(route.filters).hasSize(1)
                 val filter = route.filters[0]
-                assertThat(filter.name).isEqualTo("AddRequestHeader")
-                assertThat(filter.args).containsEntry("headerName", "X-Test")
+                assertThat(filter.type).isEqualTo("AddRequestHeader")
+                assertThat(filter.args).containsEntry("X-Test", "test-value")
             }
     }
 
@@ -50,7 +52,7 @@ class FilterDefinitionPropertiesTest {
             .withPropertyValues(
                 "lite.gateway.routes[0].id=test-route",
                 "lite.gateway.routes[0].uri=http://localhost:8080",
-                "lite.gateway.routes[0].filters[0].name=" // 빈 필터 이름
+                "lite.gateway.routes[0].filters[0].type=" // 빈 필터 이름
             )
             .withBean(MethodValidationPostProcessor::class.java)
             .withSystemProperties("spring.main.fail-on-validation-error=true")
@@ -62,12 +64,12 @@ class FilterDefinitionPropertiesTest {
     }
 
     @Test
-    @DisplayName("defaultFilters에 이름이 비어있는 필터가 있는 경우 컨텍스트 로드에 실패한다")
-    fun `context fails to load when default-filter name is empty`() {
+    @DisplayName("globalfilters 이름이 비어있는 필터가 있는 경우 컨텍스트 로드에 실패한다")
+    fun `context fails to load when globalfilters name is empty`() {
         contextRunner
             .withPropertyValues(
-                "lite.gateway.default-filters[0].name=",
-                "lite.gateway.default-filters[0].args.key=value"
+                "lite.gateway.globalfilters[0].type=",
+                "lite.gateway.globalfilters[0].args.key=value"
             )
             .withBean(MethodValidationPostProcessor::class.java)
             .withSystemProperties("spring.main.fail-on-validation-error=true")

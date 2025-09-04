@@ -3,7 +3,6 @@ package dev.jazzybyte.lite.gateway.config
 import dev.jazzybyte.lite.gateway.config.validation.UriValidator
 import dev.jazzybyte.lite.gateway.exception.RouteConfigurationException
 import dev.jazzybyte.lite.gateway.filter.FilterDefinition
-import dev.jazzybyte.lite.gateway.route.PredicateDefinition
 import dev.jazzybyte.lite.gateway.route.RouteDefinition
 import io.mockk.every
 import io.mockk.just
@@ -16,21 +15,28 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
+import dev.jazzybyte.lite.gateway.predicate.PredicateRegistry
+import dev.jazzybyte.lite.gateway.filter.GatewayFilterFactory
+import dev.jazzybyte.lite.gateway.filter.core.GatewayFilter
+
 @DisplayName("RouteBuilder 테스트")
 class RouteBuilderTest {
 
     private lateinit var predicateRegistry: PredicateRegistry
     private lateinit var uriValidator: UriValidator
     private lateinit var routeBuilder: RouteBuilder
+    private lateinit var gatewayFilterFactory: GatewayFilterFactory
 
     @BeforeEach
     fun setUp() {
         predicateRegistry = mockk<PredicateRegistry>()
         uriValidator = mockk<UriValidator>()
-        routeBuilder = RouteBuilder(predicateRegistry, uriValidator)
+        gatewayFilterFactory = mockk<GatewayFilterFactory>()
+        routeBuilder = RouteBuilder(predicateRegistry, uriValidator, gatewayFilterFactory)
         
         // UriValidator의 기본 동작 설정 - 정상적인 URI에 대해서는 예외를 발생시키지 않음
         every { uriValidator.validateUriFormat(any(), any()) } just runs
+        every { gatewayFilterFactory.create(any()) } returns mockk<GatewayFilter>()
     }
 
     @Test
@@ -152,7 +158,7 @@ class RouteBuilderTest {
             uri = "http://example.com",
             predicates = emptyList(),
             filters = mutableListOf(
-                FilterDefinition(name = "", args = mapOf("key" to "value"))
+                FilterDefinition(type = "", args = mapOf("key" to "value"))
             ),
             order = 1
         )
