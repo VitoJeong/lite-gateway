@@ -1,11 +1,13 @@
 package dev.jazzybyte.lite.gateway.route
 
-import dev.jazzybyte.lite.gateway.config.PredicateRegistry
+import dev.jazzybyte.lite.gateway.config.FilterRegistry
+import dev.jazzybyte.lite.gateway.predicate.PredicateRegistry
 import dev.jazzybyte.lite.gateway.config.RouteBuilder
 import dev.jazzybyte.lite.gateway.config.validation.UriValidator
 import dev.jazzybyte.lite.gateway.exception.PredicateDiscoveryException
 import dev.jazzybyte.lite.gateway.exception.PredicateInstantiationException
 import dev.jazzybyte.lite.gateway.exception.RouteConfigurationException
+import dev.jazzybyte.lite.gateway.filter.GatewayFilterFactory
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotNull
@@ -21,12 +23,15 @@ private val log = KotlinLogging.logger {}
  * - RouteBuilder: 라우트 생성 로직
  * - UriValidator: URI 검증 로직
  */
-class WebfluxRouteLocatorFactory : RouteLocatorFactory {
+class WebfluxRouteLocatorFactory(
+    private val gatewayFilterFactory: GatewayFilterFactory // Add this dependency
+) : RouteLocatorFactory {
 
     // 컴포넌트 인스턴스들
     private val predicateRegistry = PredicateRegistry()
+    private val filterRegistry = FilterRegistry() // filterRegistry is not used, can be removed later if confirmed
     private val uriValidator = UriValidator()
-    private val routeBuilder = RouteBuilder(predicateRegistry, uriValidator)
+    private val routeBuilder = RouteBuilder(predicateRegistry, uriValidator, gatewayFilterFactory) // Pass the factory
 
     /**
      * RouteDefinition 목록으로부터 RouteLocator를 생성합니다.
@@ -84,7 +89,7 @@ class WebfluxRouteLocatorFactory : RouteLocatorFactory {
                 "creation_time=${routeCreationTime}ms"
             }
 
-            logPredicateMappings(def, route, predicateRegistry)
+            logPredicateMappings(def, predicateRegistry)
 
             return route
 
@@ -145,7 +150,7 @@ class WebfluxRouteLocatorFactory : RouteLocatorFactory {
     /**
      * Predicate 매핑 정보를 로깅합니다.
      */
-    private fun logPredicateMappings(def: RouteDefinition, route: Route, predicateRegistry: PredicateRegistry) {
+    private fun logPredicateMappings(def: RouteDefinition, predicateRegistry: PredicateRegistry) {
         if (def.predicates.isNotEmpty()) {
             val predicateMappings = def.predicates.mapIndexed { idx, predicate ->
                 val predicateClass = predicateRegistry.getPredicateClass(predicate.name)
