@@ -11,7 +11,7 @@ import org.springframework.web.server.ServerWebExchange
 
 /**
  * Spring WebFlux의 ServerWebExchange를 GatewayContext 인터페이스에 맞게 래핑하는 어댑터 클래스.
- * core 모듈의 필터들이 Spring 객체에 직접 의존하지 않고 작업할 수 있도록 합니다.
+ * core 모듈의 필터들이 Spring 객체에 직접 의존하지 않고 작업할 수 있도록 한다.
  */
 class WebFluxGatewayContext(
     val exchange: ServerWebExchange, // Spring의 ServerWebExchange를 내부적으로 가짐
@@ -22,8 +22,8 @@ class WebFluxGatewayContext(
     override val response: GatewayResponse by lazy { WebFluxGatewayResponse(exchange.response) }
 
     override fun getAttribute(name: String): Any? {
-        // 매칭된 라우트와 같은 핵심 속성은 직접 제공하거나 Spring의 attributes에서 가져옵니다.
-        // 여기서는 Route 객체를 직접 전달받아 사용합니다.
+        // 매칭된 라우트와 같은 핵심 속성은 직접 제공하거나 Spring의 attributes에서 가져온다.
+        // 여기서는 Route 객체를 직접 전달받아 사용한다.
         if (name == "matchedRoute") { // GatewayHandlerMapping.MATCHED_ROUTE_ATTRIBUTE 에 해당하는 문자열
             return matchedRoute
         }

@@ -6,13 +6,13 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 private val log = KotlinLogging.logger {}
 
 /**
- * URI 검증을 담당하는 클래스입니다.
- * 라우트 정의에서 사용되는 URI의 형식과 유효성을 검증합니다.
+ * URI 검증을 담당하는 클래스이다.
+ * 라우트 정의에서 사용되는 URI의 형식과 유효성을 검증한다.
  */
 class UriValidator {
 
     /**
-     * URI 형식을 강화된 검증 로직으로 검증합니다.
+     * URI 형식을 강화된 검증 로직으로 검증한다.
      */
     fun validateUriFormat(uriString: String, routeId: String) {
         try {
@@ -70,21 +70,21 @@ class UriValidator {
     }
 
     /**
-     * 네트워크 기반 스키마인지 확인합니다.
+     * 네트워크 기반 스키마인지 확인한다.
      */
     private fun isNetworkScheme(scheme: String): Boolean {
         return scheme.lowercase() in setOf("http", "https", "ftp", "ftps", "ws", "wss")
     }
 
     /**
-     * 문자열에 ASCII가 아닌 문자가 포함되어 있는지 확인합니다.
+     * 문자열에 ASCII가 아닌 문자가 포함되어 있는지 확인한다.
      */
     private fun containsNonAsciiCharacters(text: String): Boolean {
         return text.any { it.code > 127 }
     }
 
     /**
-     * 네트워크 기반 URI의 호스트를 검증합니다.
+     * 네트워크 기반 URI의 호스트를 검증한다.
      */
     private fun validateNetworkHost(uri: java.net.URI, uriString: String, routeId: String) {
         // 호스트가 null이거나 빈 문자열인 경우 (IDN 처리 전에 확인)
@@ -167,7 +167,7 @@ class UriValidator {
     }
 
     /**
-     * IPv6 주소인지 확인합니다.
+     * IPv6 주소인지 확인한다.
      */
     private fun isIPv6Address(host: String): Boolean {
         return host.startsWith("[") && host.endsWith("]")
@@ -222,7 +222,7 @@ class UriValidator {
     }
 
     /**
-     * 인코딩되지 않은 공백을 검증합니다.
+     * 인코딩되지 않은 공백을 검증한다.
      */
     private fun validateUnEncodedSpaces(uriString: String, routeId: String) {
         // 경로 부분에서 인코딩되지 않은 공백 검증

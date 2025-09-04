@@ -7,8 +7,8 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 private val log = KotlinLogging.logger {}
 
 /**
- * Predicate 클래스의 발견, 등록, 관리를 담당하는 클래스입니다.
- * 패키지 스캔을 통해 RoutePredicate 구현체들을 찾고 이름-클래스 매핑을 관리합니다.
+ * Predicate 클래스의 발견, 등록, 관리를 담당하는 클래스이다.
+ * 패키지 스캔을 통해 RoutePredicate 구현체들을 찾고 이름-클래스 매핑을 관리한다.
  */
 class PredicateRegistry {
 
@@ -19,32 +19,32 @@ class PredicateRegistry {
     }
 
     /**
-     * 등록된 Predicate 클래스들의 이름 목록을 반환합니다.
+     * 등록된 Predicate 클래스들의 이름 목록을 반환한다.
      */
     fun getAvailablePredicateNames(): Set<String> = predicateClasses.keys
 
     /**
-     * Predicate 이름으로 클래스를 조회합니다.
+     * Predicate 이름으로 클래스를 조회한다.
      */
     fun getPredicateClass(predicateName: String): Class<out RoutePredicate>? {
         return predicateClasses[predicateName]
     }
 
     /**
-     * Predicate가 등록되어 있는지 확인합니다.
+     * Predicate가 등록되어 있는지 확인한다.
      */
     fun isPredicateRegistered(predicateName: String): Boolean {
         return predicateClasses.containsKey(predicateName)
     }
 
     /**
-     * 등록된 Predicate 클래스 수를 반환합니다.
+     * 등록된 Predicate 클래스 수를 반환한다.
      */
     fun getRegisteredPredicateCount(): Int = predicateClasses.size
 
     /**
      * Predicate 클래스들을 초기화하고 검증하는 함수
-     * 패키지 스캔 결과를 검증하고 중복 Predicate 이름을 처리합니다.
+     * 패키지 스캔 결과를 검증하고 중복 Predicate 이름을 처리한다.
      */
     private fun initializePredicateClasses(): Map<String, Class<out RoutePredicate>> {
         val packageName = "dev.jazzybyte.lite.gateway.route"
@@ -108,7 +108,7 @@ class PredicateRegistry {
     }
 
     /**
-     * 패키지 스캔 결과를 검증합니다.
+     * 패키지 스캔 결과를 검증한다.
      */
     private fun validatePackageScanResults(
         discoveredClasses: List<Class<out RoutePredicate>>,
@@ -143,7 +143,7 @@ class PredicateRegistry {
     }
 
     /**
-     * Predicate 클래스들로부터 이름-클래스 매핑을 생성하고 중복을 처리합니다.
+     * Predicate 클래스들로부터 이름-클래스 매핑을 생성하고 중복을 처리한다.
      */
     private fun buildPredicateMap(
         discoveredClasses: List<Class<out RoutePredicate>>

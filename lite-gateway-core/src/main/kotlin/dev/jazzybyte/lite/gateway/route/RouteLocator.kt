@@ -5,7 +5,7 @@ import reactor.core.publisher.Mono
 
 /**
  * 요청에 맞는 라우팅 정보를 찾는 인터페이스
- * 요청을 처리할 라우트를 찾기 위한 메서드를 정의합니다.
+ * 요청을 처리할 라우트를 찾기 위한 메서드를 정의한다.
  */
 interface RouteLocator {
 

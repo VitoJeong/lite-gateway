@@ -15,8 +15,8 @@ class FilterRegistryTest {
     @BeforeEach
     fun setUp() {
         // 테스트를 실행하기 위해서는 dev.jazzybyte.lite.gateway.filter 패키지 내에
-        // 적어도 하나 이상의 GatewayFilter 구현체가 존재해야 합니다.
-        // 만약 구현체가 없다면, FilterDiscoveryException이 발생하여 테스트가 실패합니다.
+        // 적어도 하나 이상의 GatewayFilter 구현체가 존재해야 한다.
+        // 만약 구현체가 없다면, FilterDiscoveryException이 발생하여 테스트가 실패한다.
         try {
             filterRegistry = FilterRegistry()
         } catch (e: Exception) {

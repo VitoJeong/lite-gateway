@@ -10,10 +10,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Configuration
 
 /**
- * Lite Gateway의 자동 설정을 위한 클래스입니다.
+ * Lite Gateway의 자동 설정을 위한 클래스이다.
  * 
- * 이 클래스는 자동 설정 조건만 정의하고, 실제 빈 등록은 WebFluxGatewayConfiguration에서 수행합니다.
- * WebFluxGatewayConfiguration은 별도의 AutoConfiguration으로 등록되어 자동으로 로드됩니다.
+ * 이 클래스는 자동 설정 조건만 정의하고, 실제 빈 등록은 WebFluxGatewayConfiguration에서 수행한다.
+ * WebFluxGatewayConfiguration은 별도의 AutoConfiguration으로 등록되어 자동으로 로드된다.
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnProperty(

@@ -26,8 +26,8 @@ import java.time.Duration
 private val log = KotlinLogging.logger {}
 
 /**
- * WebFluxHttpClient HTTP 요청을 처리하기 위한 클라이언트입니다.
- * WebClient를 사용하여 비동기 HTTP 요청을 처리합니다.
+ * WebFluxHttpClient HTTP 요청을 처리하기 위한 클라이언트이다.
+ * WebClient를 사용하여 비동기 HTTP 요청을 처리한다.
  */
 class WebFluxHttpClient (
     private val maxConnections: Int,
@@ -47,7 +47,7 @@ class WebFluxHttpClient (
 
     companion object {
         /**
-         * WebClient 인스턴스를 생성합니다.
+         * WebClient 인스턴스를 생성한다.
          *
          * @param properties HTTP 클라이언트 설정 속성
          * @return 생성된 WebClient 인스턴스
@@ -130,7 +130,7 @@ class WebFluxHttpClient (
     }
 
     /**
-     * 요청의 쿼리 파라미터를 URL 인코딩하여 쿼리 문자열로 변환합니다.
+     * 요청의 쿼리 파라미터를 URL 인코딩하여 쿼리 문자열로 변환한다.
      */
     private fun buildQueryString(request: ServerHttpRequest): String {
         val queryParams = request.queryParams

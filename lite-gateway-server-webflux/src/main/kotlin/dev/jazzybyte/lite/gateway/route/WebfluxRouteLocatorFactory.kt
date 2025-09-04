@@ -15,8 +15,8 @@ import jakarta.validation.constraints.NotNull
 private val log = KotlinLogging.logger {}
 
 /**
- * StaticRouteLocatorFactory RouteLocator를 생성하는 팩토리 클래스입니다.
- * 이 클래스는 여러 전문화된 컴포넌트들을 조율하여 라우트 정의를 기반으로 라우트를 생성합니다.
+ * StaticRouteLocatorFactory RouteLocator를 생성하는 팩토리 클래스이다.
+ * 이 클래스는 여러 전문화된 컴포넌트들을 조율하여 라우트 정의를 기반으로 라우트를 생성한다.
  *
  * 주요 컴포넌트:
  * - PredicateRegistry: Predicate 클래스 발견 및 관리
@@ -34,7 +34,7 @@ class WebfluxRouteLocatorFactory(
     private val routeBuilder = RouteBuilder(predicateRegistry, uriValidator, gatewayFilterFactory) // Pass the factory
 
     /**
-     * RouteDefinition 목록으로부터 RouteLocator를 생성합니다.
+     * RouteDefinition 목록으로부터 RouteLocator를 생성한다.
      */
     override fun create(routesDefinitions: @NotNull @Valid MutableList<RouteDefinition>): RouteLocator {
         val startTime = System.currentTimeMillis()
@@ -53,8 +53,8 @@ class WebfluxRouteLocatorFactory(
     }
 
     /**
-     * RouteDefinition 목록으로부터 Route 목록을 생성합니다.
-     * 메모리 효율성을 위해 ArrayList를 사전 할당합니다.
+     * RouteDefinition 목록으로부터 Route 목록을 생성한다.
+     * 메모리 효율성을 위해 ArrayList를 사전 할당한다.
      */
     private fun createRoutes(routeDefinitions: List<RouteDefinition>): List<Route> {
         // Pre-allocate ArrayList with known size to avoid resizing
@@ -69,7 +69,7 @@ class WebfluxRouteLocatorFactory(
     }
 
     /**
-     * 단일 RouteDefinition으로부터 Route를 생성합니다.
+     * 단일 RouteDefinition으로부터 Route를 생성한다.
      */
     private fun createSingleRoute(def: RouteDefinition, currentIndex: Int, totalCount: Int): Route {
         val routeStartTime = System.currentTimeMillis()
@@ -121,7 +121,7 @@ class WebfluxRouteLocatorFactory(
     }
 
     /**
-     * 라우트 생성 완료를 로깅합니다.
+     * 라우트 생성 완료를 로깅한다.
      */
     private fun logRouteCreationCompletion(routes: List<Route>, totalCreationTime: Long) {
         val totalPredicates = routes.sumOf { it.predicates.size }
@@ -148,7 +148,7 @@ class WebfluxRouteLocatorFactory(
     }
 
     /**
-     * Predicate 매핑 정보를 로깅합니다.
+     * Predicate 매핑 정보를 로깅한다.
      */
     private fun logPredicateMappings(def: RouteDefinition, predicateRegistry: PredicateRegistry) {
         if (def.predicates.isNotEmpty()) {
@@ -161,7 +161,7 @@ class WebfluxRouteLocatorFactory(
     }
 
     /**
-     * 라우트 생성 실패를 로깅합니다.
+     * 라우트 생성 실패를 로깅한다.
      */
     private fun logRouteCreationFailure(def: RouteDefinition, routeCreationTime: Long, e: Exception) {
         log.error {
@@ -172,8 +172,8 @@ class WebfluxRouteLocatorFactory(
     }
 
     /**
-     * 라우트 정의들의 order 값 중복을 검증합니다.
-     * 동일한 order 값을 가진 라우트들이 발견되면 RouteConfigurationException을 발생시킵니다.
+     * 라우트 정의들의 order 값 중복을 검증한다.
+     * 동일한 order 값을 가진 라우트들이 발견되면 RouteConfigurationException을 발생시킨다.
      *
      * @param routeDefinitions 검증할 라우트 정의 목록
      * @throws RouteConfigurationException 중복된 order 값이 발견된 경우
@@ -202,8 +202,8 @@ class WebfluxRouteLocatorFactory(
     }
 
     /**
-     * 성능 통계 및 캐시 정보를 반환합니다.
-     * 모니터링 및 디버깅 목적으로 사용됩니다.
+     * 성능 통계 및 캐시 정보를 반환한다.
+     * 모니터링 및 디버깅 목적으로 사용된다.
      */
     fun getPerformanceStatistics(): Map<String, Any> {
         val routeBuilderStats = RouteBuilder.getCacheStatistics()
@@ -223,8 +223,8 @@ class WebfluxRouteLocatorFactory(
     }
 
     /**
-     * 모든 캐시를 정리합니다.
-     * 메모리 관리 또는 테스트 목적으로 사용됩니다.
+     * 모든 캐시를 정리한다.
+     * 메모리 관리 또는 테스트 목적으로 사용된다.
      */
     fun clearAllCaches() {
         routeBuilder.clearPredicateCache()
@@ -233,8 +233,8 @@ class WebfluxRouteLocatorFactory(
     }
 
     /**
-     * 캐시 통계를 리셋합니다.
-     * 테스트 또는 모니터링 리셋 목적으로 사용됩니다.
+     * 캐시 통계를 리셋한다.
+     * 테스트 또는 모니터링 리셋 목적으로 사용된다.
      */
     fun resetCacheStatistics() {
         RouteBuilder.resetCacheStatistics()

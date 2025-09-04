@@ -82,8 +82,8 @@ class Route(
 
     companion object {
         /**
-         * IDN 지원과 함께 URI를 생성합니다.
-         * 매우 긴 경로나 잘못된 IDN의 경우 원본 URI를 사용합니다.
+         * IDN 지원과 함께 URI를 생성한다.
+         * 매우 긴 경로나 잘못된 IDN의 경우 원본 URI를 사용한다.
          */
         private fun createUriWithIdnSupport(uriString: String): URI {
             return try {
@@ -119,7 +119,7 @@ class Route(
         }
 
         /**
-         * 문자열에 ASCII가 아닌 문자가 포함되어 있는지 확인합니다.
+         * 문자열에 ASCII가 아닌 문자가 포함되어 있는지 확인한다.
          */
         private fun containsNonAsciiCharacters(text: String): Boolean {
             return text.any { it.code > 127 }

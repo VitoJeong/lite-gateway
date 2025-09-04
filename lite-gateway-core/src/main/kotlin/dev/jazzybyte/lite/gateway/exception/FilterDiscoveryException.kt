@@ -1,8 +1,8 @@
 package dev.jazzybyte.lite.gateway.exception
 
 /**
- * Filter 클래스를 검색하거나 로드할 수 없을 때 발생하는 예외입니다.
- * 이 예외는 실패한 필터 검색 프로세스에 대한 자세한 정보를 제공합니다.
+ * Filter 클래스를 검색하거나 로드할 수 없을 때 발생하는 예외이다.
+ * 이 예외는 실패한 필터 검색 프로세스에 대한 자세한 정보를 제공한다.
  *
  * @param message 검색 문제를 설명하는 오류 메시지
  * @param filterName 검색할 수 없었던 Filter 이름 (선택 사항)

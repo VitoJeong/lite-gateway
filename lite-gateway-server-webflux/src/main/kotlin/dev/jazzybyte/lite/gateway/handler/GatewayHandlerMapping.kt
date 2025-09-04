@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono
 private val log = KotlinLogging.logger {}
 
 /**
- * GatewayHandlerMapping 클래스는 요청을 처리할 핸들러를 결정하는 역할을 합니다.
+ * GatewayHandlerMapping 클래스는 요청을 처리할 핸들러를 결정하는 역할을 한다.
  *
  * @property routeLocator 요청에 대한 라우팅 정보를 제공하는 RouteLocator
  * @property filterHandler 요청 필터링을 처리하는 FilterHandler
@@ -22,7 +22,7 @@ class GatewayHandlerMapping(
 ) : AbstractHandlerMapping() {
 
     init {
-        order = 0 // 핸들러 매핑의 우선순위를 설정합니다. 낮을수록 우선순위가 높습니다.
+        order = 0 // 핸들러 매핑의 우선순위를 설정한다. 낮을수록 우선순위가 높다.
     }
 
     companion object {
@@ -30,7 +30,7 @@ class GatewayHandlerMapping(
     }
 
     /**
-     * 요청에 맞는 핸들러를 반환합니다.
+     * 요청에 맞는 핸들러를 반환한다.
      */
     override fun getHandlerInternal(exchange: ServerWebExchange): Mono<FilterHandler> = resolveHandler(exchange)
 

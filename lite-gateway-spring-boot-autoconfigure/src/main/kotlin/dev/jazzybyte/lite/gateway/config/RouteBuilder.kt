@@ -19,8 +19,8 @@ import java.net.URI
 private val log = KotlinLogging.logger {}
 
 /**
- * 라우트 생성 로직을 담당하는 클래스입니다.
- * RouteDefinition을 Route 객체로 변환하고 관련 검증을 수행합니다.
+ * 라우트 생성 로직을 담당하는 클래스이다.
+ * RouteDefinition을 Route 객체로 변환하고 관련 검증을 수행한다.
  * 
  * 성능 최적화:
  * - Predicate 인스턴스 캐싱으로 동일한 설정의 Predicate 재사용
@@ -79,7 +79,7 @@ class RouteBuilder(
     fun getCacheSize(): Int = predicateInstanceCache.size
 
     /**
-     * RouteDefinition을 Route 객체로 변환합니다.
+     * RouteDefinition을 Route 객체로 변환한다.
      */
     fun buildRoute(def: RouteDefinition): Route {
         // 라우트 정의 검증
@@ -105,7 +105,7 @@ class RouteBuilder(
     }
 
     /**
-     * 라우트 정의의 유효성을 검증합니다.
+     * 라우트 정의의 유효성을 검증한다.
      */
     private fun validateRouteDefinition(def: RouteDefinition) {
         // 필수 필드 검증
@@ -140,8 +140,8 @@ class RouteBuilder(
     }
 
     /**
-     * RouteDefinition으로부터 Predicate 인스턴스들을 생성합니다.
-     * 성능 최적화를 위해 동일한 설정의 Predicate는 캐시에서 재사용합니다.
+     * RouteDefinition으로부터 Predicate 인스턴스들을 생성한다.
+     * 성능 최적화를 위해 동일한 설정의 Predicate는 캐시에서 재사용한다.
      */
     private fun createPredicates(def: RouteDefinition): List<RoutePredicate> {
         return def.predicates.map { predicateDef ->
@@ -150,7 +150,7 @@ class RouteBuilder(
     }
     
     /**
-     * 단일 Predicate 인스턴스를 생성하거나 캐시에서 가져옵니다.
+     * 단일 Predicate 인스턴스를 생성하거나 캐시에서 가져온다.
      */
     private fun createSinglePredicate(routeId: String, predicateDef: PredicateDefinition): RoutePredicate {
         // 빈 Predicate 이름 검증
@@ -209,7 +209,7 @@ class RouteBuilder(
     }
     
     /**
-     * Predicate 캐시 키를 생성합니다.
+     * Predicate 캐시 키를 생성한다.
      * 형식: "PredicateName:arg1,arg2,..."
      */
     private fun createPredicateCacheKey(predicateDef: PredicateDefinition): String {
@@ -218,7 +218,7 @@ class RouteBuilder(
     }
 
     /**
-     * Predicate 인스턴스화 오류를 처리합니다.
+     * Predicate 인스턴스화 오류를 처리한다.
      */
     private fun handlePredicateInstantiationError(
         cause: Exception,
@@ -284,7 +284,7 @@ class RouteBuilder(
     }
 
     /**
-     * order 값을 검증하고 정규화합니다.
+     * order 값을 검증하고 정규화한다.
      */
     private fun validateAndNormalizeOrder(routeId: String, order: Int): Int {
         return if (order < 0) {

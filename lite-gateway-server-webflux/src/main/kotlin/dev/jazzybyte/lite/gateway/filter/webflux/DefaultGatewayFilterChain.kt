@@ -7,7 +7,7 @@ import reactor.core.publisher.Mono
 
 /**
  * GatewayFilterChain 인터페이스의 기본 구현체.
- * 필터 목록을 순회하며 각 필터를 실행하고, 마지막에는 최종 액션을 수행합니다.
+ * 필터 목록을 순회하며 각 필터를 실행하고, 마지막에는 최종 액션을 수행한다.
  */
 class DefaultGatewayFilterChain(
     private val filters: List<GatewayFilter>,
@@ -17,7 +17,7 @@ class DefaultGatewayFilterChain(
     private var index: Int = 0
 
     /**
-     * 필터 체인을 시작하거나 다음 필터를 실행합니다.
+     * 필터 체인을 시작하거나 다음 필터를 실행한다.
      *
      * @param context 현재 요청/응답 컨텍스트
      * @return 필터 체인의 완료를 나타내는 Mono<Void>

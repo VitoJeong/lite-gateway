@@ -15,8 +15,8 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 /**
- * WebFlux 기반 Gateway의 구체적인 빈 설정을 담당하는 클래스입니다.
- * LiteGatewayAutoConfiguration이 활성화된 후에 실행됩니다.
+ * WebFlux 기반 Gateway의 구체적인 빈 설정을 담당하는 클래스이다.
+ * LiteGatewayAutoConfiguration이 활성화된 후에 실행된다.
  */
 @Configuration
 @AutoConfigureAfter(LiteGatewayAutoConfiguration::class)
