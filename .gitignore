@@ -25,6 +25,8 @@ bin/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+.kiro
+GEMINI.md
 
 ### NetBeans ###
 /nbproject/private/
