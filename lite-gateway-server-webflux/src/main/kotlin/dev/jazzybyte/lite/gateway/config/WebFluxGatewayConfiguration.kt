@@ -1,12 +1,11 @@
 package dev.jazzybyte.lite.gateway.config
 
 import dev.jazzybyte.lite.gateway.client.WebFluxHttpClient
-import dev.jazzybyte.lite.gateway.filter.core.GatewayFilter
 import dev.jazzybyte.lite.gateway.handler.FilterHandler
 import dev.jazzybyte.lite.gateway.handler.GatewayHandlerMapping
 import dev.jazzybyte.lite.gateway.route.RouteLocator
 import dev.jazzybyte.lite.gateway.route.RouteLocatorFactory
-import dev.jazzybyte.lite.gateway.filter.webflux.DefaultGatewayFilterFactory
+import dev.jazzybyte.lite.gateway.filter.webflux.WebfluxGatewayFilterFactory
 import dev.jazzybyte.lite.gateway.route.WebfluxRouteLocatorFactory
 import org.springframework.boot.autoconfigure.AutoConfigureAfter
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
@@ -27,13 +26,13 @@ class WebFluxGatewayConfiguration(
 
     @Bean
     @ConditionalOnMissingBean
-    fun gatewayFilterFactory(): DefaultGatewayFilterFactory {
-        return DefaultGatewayFilterFactory()
+    fun gatewayFilterFactory(): WebfluxGatewayFilterFactory {
+        return WebfluxGatewayFilterFactory()
     }
 
     @Bean
     @ConditionalOnMissingBean
-    fun routeLocatorFactory(gatewayFilterFactory: DefaultGatewayFilterFactory): RouteLocatorFactory {
+    fun routeLocatorFactory(gatewayFilterFactory: WebfluxGatewayFilterFactory): RouteLocatorFactory {
         return WebfluxRouteLocatorFactory(gatewayFilterFactory)
     }
 

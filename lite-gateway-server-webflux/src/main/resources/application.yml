@@ -1,6 +1,29 @@
-spring:
-  application:
-    name: lite-gateway-spring-boot-autoconfigure
-logging:
-  level:
-    root: debug
+lite:
+  gateway:
+    routes:
+      - id: user-service-route
+        uri: http://localhost:8081 # 대상 서비스 URI
+        predicates:
+          - Path=/api/users/**
+        filters:
+          - name: AddRequestHeader
+            args:
+              name: X-Gateway-Route
+              value: user-service-route
+          - name: AddResponseHeader
+            args:
+              name: X-Gateway-Timestamp
+              value: ${T(java.time.Instant).now().toEpochMilli()} # SPEL 표현식 예시 (동작하려면 추가 설정 필요)
+
+      - id: product-service-route
+        uri: https://httpbin.org # 테스트용 외부 서비스
+        predicates:
+          - Path=/api/products/**
+        filters:
+          - name: RemoveRequestHeader
+            args:
+              name: Cookie
+          - name: AddRequestHeader
+            args:
+              name: X-Test-Header
+              value: "Hello from Lite Gateway"

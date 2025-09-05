@@ -14,8 +14,8 @@ import org.springframework.web.server.ServerWebExchange
  * core 모듈의 필터들이 Spring 객체에 직접 의존하지 않고 작업할 수 있도록 한다.
  */
 class WebFluxGatewayContext(
-    val exchange: ServerWebExchange, // Spring의 ServerWebExchange를 내부적으로 가짐
-    private val matchedRoute: Route // 매칭된 라우트 정보 (필터에서 필요할 수 있음)
+    var exchange: ServerWebExchange,
+    val matchedRoute: Route
 ) : GatewayContext {
 
     override val request: GatewayRequest by lazy { WebFluxGatewayRequest(exchange.request) }
