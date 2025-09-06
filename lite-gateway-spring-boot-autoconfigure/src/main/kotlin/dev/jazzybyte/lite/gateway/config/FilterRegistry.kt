@@ -15,10 +15,12 @@ class FilterRegistry {
     companion object {
         private val log = KotlinLogging.logger {}
 
-        private val filterClasses: Map<String, Class<out GatewayFilter>>
+        private val filterClasses: MutableMap<String, Class<out GatewayFilter>>
+        private val filterMetadata: MutableMap<String, FilterMetadata> = mutableMapOf()
 
         init {
-            filterClasses = initializeFilterClasses()
+            filterClasses = initializeFilterClasses().toMutableMap()
+            initializeFilterMetadata()
         }
 
         /**
@@ -51,6 +53,116 @@ class FilterRegistry {
          */
         @JvmStatic
         fun getRegisteredFilterCount(): Int = filterClasses.size
+
+        /**
+         * 필터 메타데이터를 조회한다.
+         */
+        @JvmStatic
+        fun getFilterMetadata(filterName: String): FilterMetadata? {
+            return filterMetadata[filterName]
+        }
+
+        /**
+         * 모든 필터 메타데이터를 반환한다.
+         */
+        @JvmStatic
+        fun getAllFilterMetadata(): Map<String, FilterMetadata> = filterMetadata.toMap()
+
+        /**
+         * 런타임에 새로운 필터 클래스를 등록한다.
+         */
+        @JvmStatic
+        fun registerFilter(filterName: String, filterClass: Class<out GatewayFilter>): Boolean {
+            return try {
+                validateFilterClass(filterClass)
+                
+                if (filterClasses.containsKey(filterName)) {
+                    log.warn { "Filter '$filterName' is already registered. Skipping registration." }
+                    false
+                } else {
+                    filterClasses[filterName] = filterClass
+                    filterMetadata[filterName] = createFilterMetadata(filterClass)
+                    log.info { "Successfully registered filter: '$filterName' -> '${filterClass.name}'" }
+                    true
+                }
+            } catch (e: Exception) {
+                log.error(e) { "Failed to register filter '$filterName': ${e.message}" }
+                false
+            }
+        }
+
+        /**
+         * 필터 등록을 해제한다.
+         */
+        @JvmStatic
+        fun unregisterFilter(filterName: String): Boolean {
+            return if (filterClasses.containsKey(filterName)) {
+                filterClasses.remove(filterName)
+                filterMetadata.remove(filterName)
+                log.info { "Successfully unregistered filter: '$filterName'" }
+                true
+            } else {
+                log.warn { "Filter '$filterName' is not registered. Cannot unregister." }
+                false
+            }
+        }
+
+        /**
+         * 필터 클래스의 유효성을 검증한다.
+         */
+        @JvmStatic
+        fun validateFilterClass(filterClass: Class<out GatewayFilter>) {
+            // 클래스가 인스턴스화 가능한지 확인
+            try {
+                val constructors = filterClass.constructors
+                if (constructors.isEmpty()) {
+                    throw FilterDiscoveryException(
+                        message = "Filter class '${filterClass.name}' has no accessible constructors",
+                        filterName = filterClass.simpleName
+                    )
+                }
+            } catch (e: Exception) {
+                throw FilterDiscoveryException(
+                    message = "Failed to validate filter class '${filterClass.name}': ${e.message}",
+                    filterName = filterClass.simpleName,
+                    cause = e
+                )
+            }
+        }
+
+        /**
+         * 필터 이름 패턴을 검증한다.
+         */
+        @JvmStatic
+        fun validateFilterName(filterName: String): Boolean {
+            return filterName.isNotBlank() && 
+                   filterName.matches(Regex("^[a-zA-Z][a-zA-Z0-9]*$")) &&
+                   filterName.length <= 50
+        }
+
+        /**
+         * 필터 메타데이터를 초기화한다.
+         */
+        private fun initializeFilterMetadata() {
+            filterClasses.forEach { (name, clazz) ->
+                filterMetadata[name] = createFilterMetadata(clazz)
+            }
+            log.debug { "Initialized metadata for ${filterMetadata.size} filters" }
+        }
+
+        /**
+         * 필터 클래스로부터 메타데이터를 생성한다.
+         */
+        private fun createFilterMetadata(filterClass: Class<out GatewayFilter>): FilterMetadata {
+            return FilterMetadata(
+                className = filterClass.name,
+                simpleName = filterClass.simpleName,
+                packageName = filterClass.packageName,
+                constructorCount = filterClass.constructors.size,
+                isAbstract = java.lang.reflect.Modifier.isAbstract(filterClass.modifiers),
+                registrationTime = System.currentTimeMillis()
+            )
+        }
 
         /**
          * Filter 클래스들을 초기화하고 검증하는 함수
@@ -179,4 +291,18 @@ class FilterRegistry {
             return filterMap.toMap()
         }
     }
+}
+
+/**
+ * 필터 메타데이터를 담는 데이터 클래스
+ */
+data class FilterMetadata(
+    val className: String,
+    val simpleName: String,
+    val packageName: String,
+    val constructorCount: Int,
+    val isAbstract: Boolean,
+    val registrationTime: Long
+) {
+    fun getAge(): Long = System.currentTimeMillis() - registrationTime
 }
