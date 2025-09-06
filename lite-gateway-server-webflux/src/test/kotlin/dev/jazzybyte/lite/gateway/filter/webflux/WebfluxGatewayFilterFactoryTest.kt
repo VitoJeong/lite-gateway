@@ -4,6 +4,8 @@ import dev.jazzybyte.lite.gateway.exception.FilterInstantiationException
 import dev.jazzybyte.lite.gateway.filter.AddRequestHeaderGatewayFilter
 import dev.jazzybyte.lite.gateway.filter.AddResponseHeaderGatewayFilter
 import dev.jazzybyte.lite.gateway.filter.FilterDefinition
+import dev.jazzybyte.lite.gateway.filter.ModifyRequestBodyGatewayFilter
+import dev.jazzybyte.lite.gateway.filter.ModifyResponseBodyGatewayFilter
 import dev.jazzybyte.lite.gateway.filter.RemoveRequestHeaderGatewayFilter
 import dev.jazzybyte.lite.gateway.filter.RemoveResponseHeaderGatewayFilter
 import org.assertj.core.api.Assertions.assertThat
@@ -201,6 +203,171 @@ class WebfluxGatewayFilterFactoryTest {
                 .isInstanceOf(FilterInstantiationException::class.java)
                 .hasMessageContaining("Filter type 'UnknownFilter' is not registered")
                 .hasMessageContaining("Available filters:")
+        }
+    }
+
+    @Nested
+    @DisplayName("ModifyRequestBodyGatewayFilter 생성")
+    inner class ModifyRequestBodyFilterCreation {
+
+        @Test
+        @DisplayName("대문자 변환 필터를 성공적으로 생성한다")
+        fun `creates uppercase transform filter successfully`() {
+            // Given
+            val definition = FilterDefinition(
+                type = "ModifyRequestBodyGateway",
+                args = mapOf("transformType" to "uppercase")
+            )
+
+            // When
+            val filter = factory.create(definition)
+
+            // Then
+            assertThat(filter).isInstanceOf(ModifyRequestBodyGatewayFilter::class.java)
+        }
+
+        @Test
+        @DisplayName("마스킹 필터를 성공적으로 생성한다")
+        fun `creates masking filter successfully`() {
+            // Given
+            val definition = FilterDefinition(
+                type = "ModifyRequestBodyGateway",
+                args = mapOf(
+                    "transformType" to "mask",
+                    "maskPattern" to "***"
+                )
+            )
+
+            // When
+            val filter = factory.create(definition)
+
+            // Then
+            assertThat(filter).isInstanceOf(ModifyRequestBodyGatewayFilter::class.java)
+        }
+
+        @Test
+        @DisplayName("transformType이 누락된 경우 FilterInstantiationException을 던진다")
+        fun `throws FilterInstantiationException when transformType is missing`() {
+            // Given
+            val definition = FilterDefinition(
+                type = "ModifyRequestBodyGateway",
+                args = mapOf("contentType" to "application/json")
+            )
+
+            // When & Then
+            assertThatThrownBy { factory.create(definition) }
+                .isInstanceOf(FilterInstantiationException::class.java)
+                .hasMessageContaining("Missing required arguments: [transformType]")
+        }
+
+        @Test
+        @DisplayName("지원하지 않는 transformType에 대해 FilterInstantiationException을 던진다")
+        fun `throws FilterInstantiationException for unsupported transformType`() {
+            // Given
+            val definition = FilterDefinition(
+                type = "ModifyRequestBodyGateway",
+                args = mapOf("transformType" to "unsupported_type")
+            )
+
+            // When & Then
+            assertThatThrownBy { factory.create(definition) }
+                .isInstanceOf(FilterInstantiationException::class.java)
+                .hasMessageContaining("Unsupported transformType: unsupported_type")
+        }
+    }
+
+    @Nested
+    @DisplayName("ModifyResponseBodyGatewayFilter 생성")
+    inner class ModifyResponseBodyFilterCreation {
+
+        @Test
+        @DisplayName("소문자 변환 필터를 성공적으로 생성한다")
+        fun `creates lowercase transform filter successfully`() {
+            // Given
+            val definition = FilterDefinition(
+                type = "ModifyResponseBodyGateway",
+                args = mapOf("transformType" to "lowercase")
+            )
+
+            // When
+            val filter = factory.create(definition)
+
+            // Then
+            assertThat(filter).isInstanceOf(ModifyResponseBodyGatewayFilter::class.java)
+        }
+
+        @Test
+        @DisplayName("민감한 데이터 제거 필터를 성공적으로 생성한다")
+        fun `creates sensitive data removal filter successfully`() {
+            // Given
+            val definition = FilterDefinition(
+                type = "ModifyResponseBodyGateway",
+                args = mapOf("transformType" to "remove_sensitive")
+            )
+
+            // When
+            val filter = factory.create(definition)
+
+            // Then
+            assertThat(filter).isInstanceOf(ModifyResponseBodyGatewayFilter::class.java)
+        }
+
+        @Test
+        @DisplayName("JSON 변환 필터를 성공적으로 생성한다")
+        fun `creates json transform filter successfully`() {
+            // Given
+            val definition = FilterDefinition(
+                type = "ModifyResponseBodyGateway",
+                args = mapOf(
+                    "transformType" to "json_transform",
+                    "removeFields" to "password,ssn,creditCard"
+                )
+            )
+
+            // When
+            val filter = factory.create(definition)
+
+            // Then
+            assertThat(filter).isInstanceOf(ModifyResponseBodyGatewayFilter::class.java)
+        }
+
+        @Test
+        @DisplayName("Content-Type과 order를 포함한 필터를 성공적으로 생성한다")
+        fun `creates filter with contentType and order successfully`() {
+            // Given
+            val definition = FilterDefinition(
+                type = "ModifyResponseBodyGateway",
+                args = mapOf(
+                    "transformType" to "uppercase",
+                    "contentType" to "application/json",
+                    "order" to "100"
+                ),
+                order = 50
+            )
+
+            // When
+            val filter = factory.create(definition) as ModifyResponseBodyGatewayFilter
+
+            // Then
+            assertThat(filter).isInstanceOf(ModifyResponseBodyGatewayFilter::class.java)
+            assertThat(filter.getOrder()).isEqualTo(100) // args의 order가 우선
+        }
+
+        @Test
+        @DisplayName("잘못된 Content-Type에 대해 FilterInstantiationException을 던진다")
+        fun `throws FilterInstantiationException for invalid contentType`() {
+            // Given
+            val definition = FilterDefinition(
+                type = "ModifyResponseBodyGateway",
+                args = mapOf(
+                    "transformType" to "uppercase",
+                    "contentType" to "invalid-content-type"
+                )
+            )
+
+            // When & Then
+            assertThatThrownBy { factory.create(definition) }
+                .isInstanceOf(FilterInstantiationException::class.java)
         }
     }
 
