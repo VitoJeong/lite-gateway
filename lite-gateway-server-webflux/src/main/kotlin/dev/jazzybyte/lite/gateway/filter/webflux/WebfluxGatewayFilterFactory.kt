@@ -1,32 +1,41 @@
 package dev.jazzybyte.lite.gateway.filter.webflux
 
-import dev.jazzybyte.lite.gateway.config.FilterDefinition
+import dev.jazzybyte.lite.gateway.config.FilterRegistry
+import dev.jazzybyte.lite.gateway.filter.AddRequestHeaderGatewayFilter
+import dev.jazzybyte.lite.gateway.filter.AddResponseHeaderGatewayFilter
+import dev.jazzybyte.lite.gateway.filter.FilterDefinition
 import dev.jazzybyte.lite.gateway.filter.GatewayFilterFactory
+import dev.jazzybyte.lite.gateway.filter.RemoveRequestHeaderGatewayFilter
+import dev.jazzybyte.lite.gateway.filter.RemoveResponseHeaderGatewayFilter
 import dev.jazzybyte.lite.gateway.filter.core.GatewayFilter
-import dev.jazzybyte.lite.gateway.filter.global.AddRequestHeaderGatewayFilter
-import dev.jazzybyte.lite.gateway.filter.global.AddResponseHeaderGatewayFilter
-import dev.jazzybyte.lite.gateway.filter.global.RemoveRequestHeaderGatewayFilter
-import dev.jazzybyte.lite.gateway.filter.global.RemoveResponseHeaderGatewayFilter
 
 class WebfluxGatewayFilterFactory : GatewayFilterFactory {
+
     override fun create(filterDefinition: FilterDefinition): GatewayFilter {
+        FilterRegistry.getFilterClass(filterDefinition.type)
+
         val args = filterDefinition.args
-        return when (filterDefinition.name) {
-            "AddRequestHeader" -> AddRequestHeaderGatewayFilter(
+        return when (FilterRegistry.getFilterClass(filterDefinition.type)) {
+            AddRequestHeaderGatewayFilter::class.java -> AddRequestHeaderGatewayFilter(
                 name = args["name"] ?: throw IllegalArgumentException("name arg is missing"),
                 value = args["value"] ?: throw IllegalArgumentException("value arg is missing")
             )
-            "RemoveRequestHeader" -> RemoveRequestHeaderGatewayFilter(
+
+            RemoveRequestHeaderGatewayFilter::class.java -> RemoveRequestHeaderGatewayFilter(
                 name = args["name"] ?: throw IllegalArgumentException("name arg is missing")
             )
-            "AddResponseHeader" -> AddResponseHeaderGatewayFilter(
+
+            AddResponseHeaderGatewayFilter::class.java -> AddResponseHeaderGatewayFilter(
                 name = args["name"] ?: throw IllegalArgumentException("name arg is missing"),
                 value = args["value"] ?: throw IllegalArgumentException("value arg is missing")
             )
-            "RemoveResponseHeader" -> RemoveResponseHeaderGatewayFilter(
+
+            RemoveResponseHeaderGatewayFilter::class.java -> RemoveResponseHeaderGatewayFilter(
                 name = args["name"] ?: throw IllegalArgumentException("name arg is missing")
             )
-            else -> throw IllegalArgumentException("Unknown filter: ${filterDefinition.name}")
+
+            else -> throw IllegalArgumentException("Unknown filter: ${filterDefinition.type}")
         }
     }
+
 }

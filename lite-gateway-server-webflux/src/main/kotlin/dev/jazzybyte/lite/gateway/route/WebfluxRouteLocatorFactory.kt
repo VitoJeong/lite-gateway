@@ -1,13 +1,12 @@
 package dev.jazzybyte.lite.gateway.route
 
-import dev.jazzybyte.lite.gateway.config.FilterRegistry
-import dev.jazzybyte.lite.gateway.predicate.PredicateRegistry
 import dev.jazzybyte.lite.gateway.config.RouteBuilder
 import dev.jazzybyte.lite.gateway.config.validation.UriValidator
 import dev.jazzybyte.lite.gateway.exception.PredicateDiscoveryException
 import dev.jazzybyte.lite.gateway.exception.PredicateInstantiationException
 import dev.jazzybyte.lite.gateway.exception.RouteConfigurationException
 import dev.jazzybyte.lite.gateway.filter.GatewayFilterFactory
+import dev.jazzybyte.lite.gateway.predicate.PredicateRegistry
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotNull
@@ -29,7 +28,6 @@ class WebfluxRouteLocatorFactory(
 
     // 컴포넌트 인스턴스들
     private val predicateRegistry = PredicateRegistry()
-    private val filterRegistry = FilterRegistry() // filterRegistry is not used, can be removed later if confirmed
     private val uriValidator = UriValidator()
     private val routeBuilder = RouteBuilder(predicateRegistry, uriValidator, gatewayFilterFactory) // Pass the factory
 
