@@ -1,0 +1,39 @@
+lite:
+  gateway:
+    routes:
+      - id: users-get-route
+        uri: http://localhost:8080
+        predicates:
+          - name: Path
+            args: /api/users
+          - name: Method
+            args: GET
+        order: 0
+      
+      - id: users-post-route
+        uri: http://localhost:8080
+        predicates:
+          - name: Path
+            args: /api/users
+          - name: Method
+            args: POST
+        order: 0
+      
+      - id: param-route
+        uri: http://localhost:8080
+        predicates:
+          - name: Path
+            args: /api/param
+        order: 1
+      
+      - id: api-fallback-route
+        uri: http://localhost:8080
+        predicates:
+          - name: Path
+            args: /api/**
+        order: 10
+
+logging:
+  level:
+    dev.jazzybyte.lite.gateway: DEBUG
+    root: INFO
