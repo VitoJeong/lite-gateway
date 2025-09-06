@@ -42,6 +42,7 @@ class FilterDefinitionPropertiesTest {
                 val filter = route.filters[0]
                 assertThat(filter.type).isEqualTo("AddRequestHeader")
                 assertThat(filter.args).containsEntry("X-Test", "test-value")
+                assertThat(filter.order).isEqualTo(0) // 기본값 검증
             }
     }
 
@@ -77,6 +78,37 @@ class FilterDefinitionPropertiesTest {
                 assertThat(context).hasFailed()
                 // 예외 메시지가 다를 수 있으므로 더 일반적인 검증으로 변경
                 assertThat(context.startupFailure).hasRootCauseInstanceOf(BindValidationException::class.java)
+            }
+    }
+
+    @Test
+    @DisplayName("필터 order 값이 설정된 경우 올바르게 바인딩된다")
+    fun `context loads when filter order is configured`() {
+        contextRunner
+            .withPropertyValues(
+                "lite.gateway.routes[0].id=test-route",
+                "lite.gateway.routes[0].uri=http://localhost:8080",
+                "lite.gateway.routes[0].filters[0].type=AddRequestHeader",
+                "lite.gateway.routes[0].filters[0].args.X-Test=test-value",
+                "lite.gateway.routes[0].filters[0].order=100",
+                "lite.gateway.routes[0].filters[1].type=RemoveRequestHeader",
+                "lite.gateway.routes[0].filters[1].args.X-Remove=remove-value",
+                "lite.gateway.routes[0].filters[1].order=50"
+            )
+            .run { context ->
+                assertThat(context).hasNotFailed()
+                val properties = context.getBean(LiteGatewayConfigProperties::class.java)
+                assertThat(properties.routes).hasSize(1)
+                val route = properties.routes[0]
+                assertThat(route.filters).hasSize(2)
+                
+                val firstFilter = route.filters[0]
+                assertThat(firstFilter.type).isEqualTo("AddRequestHeader")
+                assertThat(firstFilter.order).isEqualTo(100)
+                
+                val secondFilter = route.filters[1]
+                assertThat(secondFilter.type).isEqualTo("RemoveRequestHeader")
+                assertThat(secondFilter.order).isEqualTo(50)
             }
     }
 }
