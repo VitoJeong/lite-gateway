@@ -11,11 +11,11 @@ import dev.jazzybyte.lite.gateway.filter.core.GatewayFilter
 
 class WebfluxGatewayFilterFactory : GatewayFilterFactory {
 
-    override fun create(filterDefinition: FilterDefinition): GatewayFilter {
-        FilterRegistry.getFilterClass(filterDefinition.type)
+    override fun create(definition: FilterDefinition): GatewayFilter {
+        FilterRegistry.getFilterClass(definition.type)
 
-        val args = filterDefinition.args
-        return when (FilterRegistry.getFilterClass(filterDefinition.type)) {
+        val args = definition.args
+        return when (FilterRegistry.getFilterClass(definition.type)) {
             AddRequestHeaderGatewayFilter::class.java -> AddRequestHeaderGatewayFilter(
                 name = args["name"] ?: throw IllegalArgumentException("name arg is missing"),
                 value = args["value"] ?: throw IllegalArgumentException("value arg is missing")
@@ -34,7 +34,7 @@ class WebfluxGatewayFilterFactory : GatewayFilterFactory {
                 name = args["name"] ?: throw IllegalArgumentException("name arg is missing")
             )
 
-            else -> throw IllegalArgumentException("Unknown filter: ${filterDefinition.type}")
+            else -> throw IllegalArgumentException("Unknown filter: ${definition.type}")
         }
     }
 
