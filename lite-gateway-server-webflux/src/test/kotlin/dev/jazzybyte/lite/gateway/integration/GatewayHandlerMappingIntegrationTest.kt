@@ -186,7 +186,6 @@ class GatewayHandlerMappingIntegrationTest {
         )
     }
 
-
     @EnableAutoConfiguration
     @SpringBootConfiguration
     class TestConfig {

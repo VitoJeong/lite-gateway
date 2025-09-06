@@ -9,17 +9,6 @@ import kotlin.test.assertTrue
 class OrderedGatewayFilterTest {
 
     @Test
-    fun `OrderedGatewayFilter should extend both GatewayFilter and Ordered`() {
-        // Given
-        val filter = TestOrderedGatewayFilter(100)
-        
-        // Then
-        assertTrue(filter is GatewayFilter)
-        assertTrue(filter is Ordered)
-        assertTrue(filter is OrderedGatewayFilter)
-    }
-
-    @Test
     fun `OrderedGatewayFilter should return correct order value`() {
         // Given
         val expectedOrder = 42
