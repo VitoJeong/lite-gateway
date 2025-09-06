@@ -44,6 +44,7 @@ dependencies {
 
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("io.projectreactor:reactor-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     // KotlinFixture (data class 자동 생성)
     testImplementation("com.appmattus.fixture:fixture:1.2.0")
