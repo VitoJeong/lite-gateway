@@ -51,8 +51,6 @@ class PredicateRegistry {
         val discoveryStartTime = System.currentTimeMillis()
         
         try {
-            log.info { "Starting predicate discovery in package: $packageName" }
-            
             // 패키지 스캔을 통해 RoutePredicate 구현체들을 찾음
             val discoveredClasses = ReflectionUtil.findClassesOfType(packageName, RoutePredicate::class.java)
             

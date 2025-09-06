@@ -80,6 +80,14 @@ class Route(
         order: Int = Int.MAX_VALUE,
     ) : this(id, predicates, createUriWithIdnSupport(uri), order, emptyList())
 
+    constructor(
+        id: String,
+        uri: String,
+        predicates: List<RoutePredicate>,
+        order: Int = Int.MAX_VALUE,
+        filters: List<GatewayFilter>,
+    ) : this(id, predicates, createUriWithIdnSupport(uri), order, filters)
+
     companion object {
         /**
          * IDN 지원과 함께 URI를 생성한다.
