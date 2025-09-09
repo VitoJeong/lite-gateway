@@ -1,0 +1,60 @@
+# 본문 수정 필터 설정 예제
+lite:
+  gateway:
+    routes:
+      - id: api-with-request-body-modification
+        uri: http://backend-service:8080
+        order: 1
+        predicates:
+          - name: Path
+            args:
+              pattern: /api/users/**
+        filters:
+          # 요청 본문을 대문자로 변환
+          - name: ModifyRequestBodyGateway
+            args:
+              transformType: uppercase
+              contentType: application/json
+          # 응답 본문에서 민감한 데이터 마스킹
+          - name: ModifyResponseBodyGateway
+            args:
+              transformType: mask
+              maskPattern: "***"
+              order: 100
+
+      - id: api-with-sensitive-data-removal
+        uri: http://secure-service:8080
+        order: 2
+        predicates:
+          - name: Path
+            args:
+              pattern: /api/secure/**
+        filters:
+          # 요청 본문에서 특정 JSON 필드 제거
+          - name: ModifyRequestBodyGateway
+            args:
+              transformType: json_transform
+              removeFields: "password,apiKey,internalToken"
+          # 응답 본문에서 민감한 데이터 완전 제거
+          - name: ModifyResponseBodyGateway
+            args:
+              transformType: remove_sensitive
+              contentType: application/json
+
+      - id: api-with-case-transformation
+        uri: http://legacy-service:8080
+        order: 3
+        predicates:
+          - name: Path
+            args:
+              pattern: /api/legacy/**
+        filters:
+          # 요청 본문을 소문자로 변환 (레거시 시스템 호환성)
+          - name: ModifyRequestBodyGateway
+            args:
+              transformType: lowercase
+          # 응답 본문을 대문자로 변환
+          - name: ModifyResponseBodyGatewayFilter
+            args:
+              transformType: uppercase
+              contentType: text/plain
