@@ -23,15 +23,14 @@ class RewritePathGatewayFilter(
         private val log = KotlinLogging.logger {}
     }
 
-    private val pattern: Pattern = Pattern.compile(regexp)
+    private val pattern: Pattern
 
     init {
         require(regexp.isNotBlank()) { "Regular expression cannot be blank" }
         require(replacement.isNotBlank()) { "Replacement string cannot be blank" }
-        
-        // 정규식 패턴 유효성 검증
+
         try {
-            Pattern.compile(regexp)
+            pattern = Pattern.compile(regexp)
         } catch (e: Exception) {
             throw IllegalArgumentException("Invalid regular expression: $regexp", e)
         }

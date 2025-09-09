@@ -34,7 +34,7 @@ class WebfluxGatewayFilterFactoryTest {
         fun `creates filter successfully with valid arguments`() {
             // Given
             val definition = FilterDefinition(
-                type = "AddRequestHeaderGateway",
+                type = "AddRequestHeader",
                 args = mapOf("name" to "X-Test-Header", "value" to "test-value")
             )
 
@@ -50,7 +50,7 @@ class WebfluxGatewayFilterFactoryTest {
         fun `throws FilterInstantiationException when name argument is missing`() {
             // Given
             val definition = FilterDefinition(
-                type = "AddRequestHeaderGateway",
+                type = "AddRequestHeader",
                 args = mapOf("value" to "test-value")
             )
 
@@ -58,7 +58,7 @@ class WebfluxGatewayFilterFactoryTest {
             assertThatThrownBy { factory.create(definition) }
                 .isInstanceOf(FilterInstantiationException::class.java)
                 .hasMessageContaining("Missing required arguments: [name]")
-                .hasMessageContaining("AddRequestHeaderGateway")
+                .hasMessageContaining("AddRequestHeader")
         }
 
         @Test
@@ -66,7 +66,7 @@ class WebfluxGatewayFilterFactoryTest {
         fun `throws FilterInstantiationException when value argument is missing`() {
             // Given
             val definition = FilterDefinition(
-                type = "AddRequestHeaderGateway",
+                type = "AddRequestHeader",
                 args = mapOf("name" to "X-Test-Header")
             )
 
@@ -81,7 +81,7 @@ class WebfluxGatewayFilterFactoryTest {
         fun `throws FilterInstantiationException when blank argument is provided`() {
             // Given
             val definition = FilterDefinition(
-                type = "AddRequestHeaderGateway",
+                type = "AddRequestHeader",
                 args = mapOf("name" to "", "value" to "test-value")
             )
 
@@ -101,7 +101,7 @@ class WebfluxGatewayFilterFactoryTest {
         fun `creates filter successfully with valid arguments`() {
             // Given
             val definition = FilterDefinition(
-                type = "RemoveRequestHeaderGateway",
+                type = "RemoveRequestHeader",
                 args = mapOf("name" to "X-Remove-Header")
             )
 
@@ -117,7 +117,7 @@ class WebfluxGatewayFilterFactoryTest {
         fun `throws FilterInstantiationException when name argument is missing`() {
             // Given
             val definition = FilterDefinition(
-                type = "RemoveRequestHeaderGateway",
+                type = "RemoveRequestHeader",
                 args = emptyMap()
             )
 
@@ -137,7 +137,7 @@ class WebfluxGatewayFilterFactoryTest {
         fun `creates filter successfully with valid arguments`() {
             // Given
             val definition = FilterDefinition(
-                type = "AddResponseHeaderGateway",
+                type = "AddResponseHeader",
                 args = mapOf("name" to "X-Response-Header", "value" to "response-value")
             )
 
@@ -158,7 +158,7 @@ class WebfluxGatewayFilterFactoryTest {
         fun `creates filter successfully with valid arguments`() {
             // Given
             val definition = FilterDefinition(
-                type = "RemoveResponseHeaderGateway",
+                type = "RemoveResponseHeader",
                 args = mapOf("name" to "X-Remove-Response-Header")
             )
 
@@ -215,7 +215,7 @@ class WebfluxGatewayFilterFactoryTest {
         fun `creates uppercase transform filter successfully`() {
             // Given
             val definition = FilterDefinition(
-                type = "ModifyRequestBodyGateway",
+                type = "ModifyRequestBody",
                 args = mapOf("transformType" to "uppercase")
             )
 
@@ -231,7 +231,7 @@ class WebfluxGatewayFilterFactoryTest {
         fun `creates masking filter successfully`() {
             // Given
             val definition = FilterDefinition(
-                type = "ModifyRequestBodyGateway",
+                type = "ModifyRequestBody",
                 args = mapOf(
                     "transformType" to "mask",
                     "maskPattern" to "***"
@@ -250,7 +250,7 @@ class WebfluxGatewayFilterFactoryTest {
         fun `throws FilterInstantiationException when transformType is missing`() {
             // Given
             val definition = FilterDefinition(
-                type = "ModifyRequestBodyGateway",
+                type = "ModifyRequestBody",
                 args = mapOf("contentType" to "application/json")
             )
 
@@ -265,7 +265,7 @@ class WebfluxGatewayFilterFactoryTest {
         fun `throws FilterInstantiationException for unsupported transformType`() {
             // Given
             val definition = FilterDefinition(
-                type = "ModifyRequestBodyGateway",
+                type = "ModifyRequestBody",
                 args = mapOf("transformType" to "unsupported_type")
             )
 
@@ -285,7 +285,7 @@ class WebfluxGatewayFilterFactoryTest {
         fun `creates lowercase transform filter successfully`() {
             // Given
             val definition = FilterDefinition(
-                type = "ModifyResponseBodyGateway",
+                type = "ModifyResponseBody",
                 args = mapOf("transformType" to "lowercase")
             )
 
@@ -301,7 +301,7 @@ class WebfluxGatewayFilterFactoryTest {
         fun `creates sensitive data removal filter successfully`() {
             // Given
             val definition = FilterDefinition(
-                type = "ModifyResponseBodyGateway",
+                type = "ModifyResponseBody",
                 args = mapOf("transformType" to "remove_sensitive")
             )
 
@@ -317,7 +317,7 @@ class WebfluxGatewayFilterFactoryTest {
         fun `creates json transform filter successfully`() {
             // Given
             val definition = FilterDefinition(
-                type = "ModifyResponseBodyGateway",
+                type = "ModifyResponseBody",
                 args = mapOf(
                     "transformType" to "json_transform",
                     "removeFields" to "password,ssn,creditCard"
@@ -336,7 +336,7 @@ class WebfluxGatewayFilterFactoryTest {
         fun `creates filter with contentType and order successfully`() {
             // Given
             val definition = FilterDefinition(
-                type = "ModifyResponseBodyGateway",
+                type = "ModifyResponseBody",
                 args = mapOf(
                     "transformType" to "uppercase",
                     "contentType" to "application/json",
@@ -358,7 +358,7 @@ class WebfluxGatewayFilterFactoryTest {
         fun `throws FilterInstantiationException for invalid contentType`() {
             // Given
             val definition = FilterDefinition(
-                type = "ModifyResponseBodyGateway",
+                type = "ModifyResponseBody",
                 args = mapOf(
                     "transformType" to "uppercase",
                     "contentType" to "invalid-content-type"
@@ -380,7 +380,7 @@ class WebfluxGatewayFilterFactoryTest {
         fun `FilterInstantiationException contains proper context information`() {
             // Given
             val definition = FilterDefinition(
-                type = "AddRequestHeaderGateway",
+                type = "AddRequestHeader",
                 args = mapOf("invalid" to "args")
             )
 
@@ -394,7 +394,7 @@ class WebfluxGatewayFilterFactoryTest {
 
             // Then
             assertThat(caughtException).isNotNull
-            assertThat(caughtException!!.message).contains("AddRequestHeaderGateway")
+            assertThat(caughtException!!.message).contains("AddRequestHeader")
             assertThat(caughtException.args).isEqualTo(definition.args)
         }
     }

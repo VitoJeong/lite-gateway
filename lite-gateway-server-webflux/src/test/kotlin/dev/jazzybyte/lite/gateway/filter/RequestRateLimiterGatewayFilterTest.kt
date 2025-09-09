@@ -130,7 +130,7 @@ class RequestRateLimiterGatewayFilterTest {
     private fun setupMockResponse() {
         val headers = mockk<HttpHeaders>()
         every { response.headers } returns headers
-        every { response.statusCode = any() } returns Unit
+        every { response.setStatusCode(any()) } returns true
         every { headers.add(any(), any()) } returns Unit
     }
 }

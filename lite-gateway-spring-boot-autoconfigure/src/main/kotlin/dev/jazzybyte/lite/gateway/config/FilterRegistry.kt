@@ -253,9 +253,12 @@ class FilterRegistry {
         ): Map<String, Class<out GatewayFilter>> {
             val filterMap = mutableMapOf<String, Class<out GatewayFilter>>()
             val duplicateNames = mutableSetOf<String>()
+            val validClasses = discoveredClasses.filter { filterClass ->
+                !filterClass.name.contains("$") && !java.lang.reflect.Modifier.isAbstract(filterClass.modifiers)
+            }
 
-            discoveredClasses.forEach { filterClass ->
-                val filterName = filterClass.simpleName.removeSuffix("Filter")
+            validClasses.forEach { filterClass ->
+                val filterName = filterClass.simpleName.removeSuffix("GatewayFilter")
 
                 if (filterName.isBlank()) {
                     throw FilterDiscoveryException(
