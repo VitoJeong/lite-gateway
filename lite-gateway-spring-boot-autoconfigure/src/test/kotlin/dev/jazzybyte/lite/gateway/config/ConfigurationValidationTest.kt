@@ -1,8 +1,8 @@
 package dev.jazzybyte.lite.gateway.config
 
+import dev.jazzybyte.lite.gateway.client.HttpClientProperties
 import dev.jazzybyte.lite.gateway.route.PredicateDefinition
 import dev.jazzybyte.lite.gateway.route.RouteDefinition
-import jakarta.validation.ConstraintViolation
 import jakarta.validation.Validation
 import jakarta.validation.Validator
 import org.assertj.core.api.Assertions.assertThat
@@ -406,7 +406,7 @@ class ConfigurationValidationTest {
         @DisplayName("유효한 설정은 검증을 통과해야 함")
         fun `should pass validation for valid configuration`() {
             // given
-            val properties = LiteGatewayConfigProperties().apply {
+            val properties = LiteGatewayConfigProperties(
                 routes = mutableListOf(
                     RouteDefinition(
                         id = "valid-route",
@@ -416,7 +416,7 @@ class ConfigurationValidationTest {
                         )
                     )
                 )
-            }
+            )
 
             // when
             val violations = validator.validate(properties)
@@ -429,9 +429,9 @@ class ConfigurationValidationTest {
         @DisplayName("빈 routes 목록은 검증을 통과해야 함")
         fun `should pass validation for empty routes list`() {
             // given
-            val properties = LiteGatewayConfigProperties().apply {
+            val properties = LiteGatewayConfigProperties(
                 routes = mutableListOf()
-            }
+            )
 
             // when
             val violations = validator.validate(properties)
@@ -444,7 +444,7 @@ class ConfigurationValidationTest {
         @DisplayName("중첩된 RouteDefinition 검증 오류가 포함되어야 함")
         fun `should include nested RouteDefinition validation errors`() {
             // given
-            val properties = LiteGatewayConfigProperties().apply {
+            val properties = LiteGatewayConfigProperties(
                 routes = mutableListOf(
                     RouteDefinition(
                         id = "invalid-route",
@@ -455,7 +455,7 @@ class ConfigurationValidationTest {
                         order = -1 // 음수 order
                     )
                 )
-            }
+            )
 
             // when
             val violations = validator.validate(properties)
@@ -474,7 +474,7 @@ class ConfigurationValidationTest {
         @DisplayName("다중 라우트의 검증 오류가 모두 포함되어야 함")
         fun `should include validation errors from multiple routes`() {
             // given
-            val properties = LiteGatewayConfigProperties().apply {
+            val properties = LiteGatewayConfigProperties(
                 routes = mutableListOf(
                     RouteDefinition(
                         id = "invalid-route-1",
@@ -492,7 +492,7 @@ class ConfigurationValidationTest {
                         order = -1 // 음수 order
                     )
                 )
-            }
+            )
 
             // when
             val violations = validator.validate(properties)
@@ -505,6 +505,56 @@ class ConfigurationValidationTest {
                 "routes[1].predicates[0].name",
                 "routes[1].order"
             )
+        }
+
+        @Test
+        @DisplayName("유효하지 않은 HttpClient 설정은 검증에 실패해야 함")
+        fun `should fail validation for invalid http client properties`() {
+            // given
+            val properties = LiteGatewayConfigProperties(
+                httpClient = HttpClientProperties(
+                    maxConnections = 0,
+                    connectionTimeout = -1,
+                    maxHeaderSize = 0,
+                    acquireTimeout = -1
+                )
+            )
+
+            // when
+            val violations = validator.validate(properties)
+
+            // then
+            assertThat(violations).hasSize(4)
+            val violationMessages = violations.associate { it.propertyPath.toString() to it.message }
+            assertThat(violationMessages).containsEntry("httpClient.maxConnections", "maxConnections는 1 이상이어야 합니다.")
+            assertThat(violationMessages).containsEntry("httpClient.connectionTimeout", "connectionTimeout은 0 이상이어야 합니다.")
+            assertThat(violationMessages).containsEntry("httpClient.maxHeaderSize", "maxHeaderSize는 1 이상이어야 합니다.")
+            assertThat(violationMessages).containsEntry("httpClient.acquireTimeout", "acquireTimeout은 0 이상이어야 합니다.")
+        }
+
+        @Test
+        @DisplayName("유효한 HttpClient 설정은 검증을 통과해야 함")
+        fun `should pass validation for valid http client properties`() {
+            // given
+            val properties = LiteGatewayConfigProperties(
+                httpClient = HttpClientProperties(
+                    maxConnections = 1,
+                    connectionTimeout = 0,
+                    maxHeaderSize = 1,
+                    acquireTimeout = 0
+                )
+            )
+
+            // when
+            val violations = validator.validate(properties)
+
+            // then
+            assertThat(violations).isEmpty()
+            val violationPaths = violations.map { it.propertyPath.toString() }
+            assertThat(violationPaths).doesNotContain("httpClient.maxConnections")
+            assertThat(violationPaths).doesNotContain("httpClient.connectionTimeout")
+            assertThat(violationPaths).doesNotContain("httpClient.maxHeaderSize")
+            assertThat(violationPaths).doesNotContain("httpClient.acquireTimeout")
         }
     }
 }
