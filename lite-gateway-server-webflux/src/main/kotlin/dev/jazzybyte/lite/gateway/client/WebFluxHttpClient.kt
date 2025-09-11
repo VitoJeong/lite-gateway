@@ -33,16 +33,22 @@ class WebFluxHttpClient (
     private val maxConnections: Int,
     private val connectionTimeout: Int,
     private val maxHeaderSize: Int,
-    private val acquireTimeout: Int,
+    private val acquireTimeout: Long,
 ) {
 
     private val client: WebClient = create(maxConnections, connectionTimeout, maxHeaderSize, acquireTimeout)
 
     constructor() : this(
-        maxConnections = 500,
-        connectionTimeout = 5 * 1000,
-        maxHeaderSize = 8192,
-        acquireTimeout = 10 * 1000
+        HttpClientProperties()
+    )
+
+    constructor(
+        properties: HttpClientProperties
+    ) : this(
+        maxConnections = properties.maxConnections,
+        connectionTimeout = properties.connectionTimeout,
+        maxHeaderSize = properties.maxHeaderSize,
+        acquireTimeout = properties.acquireTimeout
     )
 
     companion object {
@@ -55,26 +61,30 @@ class WebFluxHttpClient (
         fun create(maxConnections: Int,
                    connectionTimeout: Int,
                    maxHeaderSize: Int,
-                   acquireTimeout: Int): WebClient {
+                   acquireTimeout: Long): WebClient {
             return WebClient.builder()
                 .exchangeStrategies(
                     ExchangeStrategies.builder()
                         // 최대 16MB 메모리 버퍼 제한
-                        .codecs { config -> config.defaultCodecs().maxInMemorySize(16 * 1024 * 1024) }
+                        .codecs { config -> config.defaultCodecs()
+                            .maxInMemorySize(16 * 1024 * 1024)
+                        }
                         .build())
                 .clientConnector(
                     ReactorClientHttpConnector(
                         // Netty HttpClient 설정
                         HttpClient.create(// ConnectionProvider로 연결 풀 설정
                             ConnectionProvider.builder("http-pool")
-                                .maxConnections(500) // 최대 연결 수 설정
+                                .maxConnections(maxConnections) // 최대 연결 수 설정
                                 .pendingAcquireMaxCount(1000) // 최대 대기 연결 수
+                                .pendingAcquireTimeout(Duration.ofMillis(acquireTimeout))
                                 .maxIdleTime(Duration.ofSeconds(60)) // 최대 유휴 시간
                                 .build())
-                            // 응답 타임아웃 설정
-                            .responseTimeout(Duration.ofSeconds(5))
                             // 연결 타임아웃 설정
-                            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, acquireTimeout)
+                            .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectionTimeout)
+                            .httpResponseDecoder { spec ->
+                                spec.maxHeaderSize(maxHeaderSize) // 최대 헤더 크기 설정
+                            }
                     )
                 )
                 .build()

@@ -45,12 +45,8 @@ class WebFluxGatewayConfiguration(
     @Bean
     @ConditionalOnMissingBean
     fun webClient(): WebFluxHttpClient {
-       val httpClient = properties.httpClient
         return WebFluxHttpClient(
-            maxConnections = httpClient.maxConnections,
-            connectionTimeout = httpClient.connectionTimeout,
-            maxHeaderSize = httpClient.maxHeaderSize,
-            acquireTimeout = httpClient.acquireTimeout
+            properties.httpClient
         )
     }
 
