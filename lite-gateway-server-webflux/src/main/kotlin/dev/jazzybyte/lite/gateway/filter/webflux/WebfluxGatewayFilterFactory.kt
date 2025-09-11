@@ -14,7 +14,7 @@ import dev.jazzybyte.lite.gateway.filter.RemoveResponseHeaderGatewayFilter
 import dev.jazzybyte.lite.gateway.filter.RequestRateLimiterGatewayFilter
 import dev.jazzybyte.lite.gateway.filter.RewritePathGatewayFilter
 import dev.jazzybyte.lite.gateway.filter.StripPrefixGatewayFilter
-import dev.jazzybyte.lite.gateway.filter.core.GatewayFilter
+import dev.jazzybyte.lite.gateway.filter.GatewayFilter
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.http.MediaType
 

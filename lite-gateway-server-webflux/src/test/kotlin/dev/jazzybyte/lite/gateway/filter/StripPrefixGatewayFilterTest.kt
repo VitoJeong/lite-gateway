@@ -1,7 +1,6 @@
 package dev.jazzybyte.lite.gateway.filter
 
 import dev.jazzybyte.lite.gateway.context.webflux.WebFluxGatewayContext
-import dev.jazzybyte.lite.gateway.filter.core.GatewayFilterChain
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify

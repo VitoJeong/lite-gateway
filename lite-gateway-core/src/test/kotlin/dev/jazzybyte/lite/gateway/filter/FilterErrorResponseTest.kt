@@ -1,4 +1,4 @@
-package dev.jazzybyte.lite.gateway.filter.core
+package dev.jazzybyte.lite.gateway.filter
 
 import dev.jazzybyte.lite.gateway.exception.FilterExecutionException
 import org.junit.jupiter.api.DisplayName
@@ -19,19 +19,22 @@ class FilterErrorResponseTest {
             routeId = "user-service",
             requestId = "req-123"
         )
-        
+
         // when
         val errorResponse = FilterErrorResponse.fromFilterExecutionException(
             exception = exception,
             status = 401,
             title = "Authentication Error"
         )
-        
+
         // then
         assertEquals("about:blank", errorResponse.type)
         assertEquals("Authentication Error", errorResponse.title)
         assertEquals(401, errorResponse.status)
-        assertEquals("Filter execution failed (filter: 'AuthFilter', route: 'user-service', request: 'req-123'): Authentication failed", errorResponse.detail)
+        assertEquals(
+            "Filter execution failed (filter: 'AuthFilter', route: 'user-service', request: 'req-123'): Authentication failed",
+            errorResponse.detail
+        )
         assertEquals("AuthFilter", errorResponse.filterName)
         assertEquals("user-service", errorResponse.routeId)
         assertEquals("req-123", errorResponse.requestId)
@@ -46,7 +49,7 @@ class FilterErrorResponseTest {
         val filterName = "CircuitBreakerFilter"
         val routeId = "payment-service"
         val requestId = "req-456"
-        
+
         // when
         val errorResponse = FilterErrorResponse.fromException(
             filterName = filterName,
@@ -56,7 +59,7 @@ class FilterErrorResponseTest {
             routeId = routeId,
             requestId = requestId
         )
-        
+
         // then
         assertEquals("about:blank", errorResponse.type)
         assertEquals("Service Unavailable", errorResponse.title)
@@ -74,13 +77,13 @@ class FilterErrorResponseTest {
         // given
         val exception = RuntimeException()
         val filterName = "TestFilter"
-        
+
         // when
         val errorResponse = FilterErrorResponse.fromException(
             filterName = filterName,
             exception = exception
         )
-        
+
         // then
         assertEquals("Unknown error occurred", errorResponse.detail)
     }
@@ -91,13 +94,13 @@ class FilterErrorResponseTest {
         // given
         val exception = RuntimeException("Test error")
         val filterName = "TestFilter"
-        
+
         // when
         val errorResponse = FilterErrorResponse.fromException(
             filterName = filterName,
             exception = exception
         )
-        
+
         // then
         assertEquals("about:blank", errorResponse.type)
         assertEquals("Filter Error", errorResponse.title)

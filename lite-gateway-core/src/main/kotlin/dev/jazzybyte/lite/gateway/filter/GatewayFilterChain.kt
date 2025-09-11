@@ -1,4 +1,4 @@
-package dev.jazzybyte.lite.gateway.filter.core
+package dev.jazzybyte.lite.gateway.filter
 
 import reactor.core.publisher.Mono
 

@@ -1,4 +1,4 @@
-package dev.jazzybyte.lite.gateway.filter.core
+package dev.jazzybyte.lite.gateway.filter
 
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -12,10 +12,10 @@ class CriticalFilterTest {
     fun `should return default failure status code 500`() {
         // given
         val criticalFilter = object : CriticalFilter {}
-        
+
         // when
         val statusCode = criticalFilter.getFailureStatusCode()
-        
+
         // then
         assertEquals(500, statusCode)
     }
@@ -26,10 +26,10 @@ class CriticalFilterTest {
         // given
         val criticalFilter = object : CriticalFilter {}
         val cause = RuntimeException("Test exception")
-        
+
         // when
         val message = criticalFilter.getFailureMessage(cause)
-        
+
         // then
         assertEquals("Filter execution failed", message)
     }
@@ -41,10 +41,10 @@ class CriticalFilterTest {
         val criticalFilter = object : CriticalFilter {
             override fun getFailureStatusCode(): Int = 401
         }
-        
+
         // when
         val statusCode = criticalFilter.getFailureStatusCode()
-        
+
         // then
         assertEquals(401, statusCode)
     }
@@ -57,10 +57,10 @@ class CriticalFilterTest {
             override fun getFailureMessage(cause: Throwable): String = "Authentication failed: ${cause.message}"
         }
         val cause = RuntimeException("Invalid token")
-        
+
         // when
         val message = criticalFilter.getFailureMessage(cause)
-        
+
         // then
         assertEquals("Authentication failed: Invalid token", message)
     }

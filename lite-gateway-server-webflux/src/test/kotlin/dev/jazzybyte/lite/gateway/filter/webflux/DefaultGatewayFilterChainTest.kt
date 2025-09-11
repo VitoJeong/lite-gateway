@@ -1,11 +1,13 @@
 package dev.jazzybyte.lite.gateway.filter.webflux
 
-import dev.jazzybyte.lite.gateway.filter.core.GatewayContext
-import dev.jazzybyte.lite.gateway.filter.core.GatewayFilter
-import dev.jazzybyte.lite.gateway.filter.core.GatewayFilterChain
-import dev.jazzybyte.lite.gateway.filter.core.GatewayRequest
-import dev.jazzybyte.lite.gateway.filter.core.GatewayResponse
-import dev.jazzybyte.lite.gateway.filter.core.GatewayContextBuilder
+import dev.jazzybyte.lite.gateway.filter.GatewayContext
+import dev.jazzybyte.lite.gateway.filter.GatewayFilter
+import dev.jazzybyte.lite.gateway.filter.GatewayFilterChain
+import dev.jazzybyte.lite.gateway.filter.GatewayRequest
+import dev.jazzybyte.lite.gateway.filter.GatewayRequestBuilder
+import dev.jazzybyte.lite.gateway.filter.GatewayResponse
+import dev.jazzybyte.lite.gateway.filter.GatewayContextBuilder
+import dev.jazzybyte.lite.gateway.filter.GatewayResponseBuilder
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 import reactor.core.publisher.Mono
@@ -225,7 +227,7 @@ private class TestGatewayRequest : GatewayRequest {
     override val method: String = "GET"
     override val path: String = "/test"
     override val headers: Map<String, List<String>> = emptyMap()
-    override fun mutate(): dev.jazzybyte.lite.gateway.filter.core.GatewayRequestBuilder = 
+    override fun mutate(): GatewayRequestBuilder =
         throw UnsupportedOperationException("Not implemented for test")
 }
 
@@ -234,6 +236,6 @@ private class TestGatewayResponse : GatewayResponse {
     override fun setHeader(name: String, value: String) {
         // No-op for test
     }
-    override fun mutate(): dev.jazzybyte.lite.gateway.filter.core.GatewayResponseBuilder = 
+    override fun mutate(): GatewayResponseBuilder =
         throw UnsupportedOperationException("Not implemented for test")
 }

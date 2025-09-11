@@ -1,6 +1,6 @@
 package dev.jazzybyte.lite.gateway.route
 
-import dev.jazzybyte.lite.gateway.filter.core.GatewayFilter
+import dev.jazzybyte.lite.gateway.filter.GatewayFilter
 import dev.jazzybyte.lite.gateway.predicate.RoutePredicate
 import java.net.URI
 

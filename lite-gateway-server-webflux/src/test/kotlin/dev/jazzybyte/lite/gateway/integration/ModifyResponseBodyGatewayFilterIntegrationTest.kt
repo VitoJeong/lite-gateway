@@ -2,14 +2,12 @@ package dev.jazzybyte.lite.gateway.integration
 
 import dev.jazzybyte.lite.gateway.context.webflux.WebFluxGatewayContext
 import dev.jazzybyte.lite.gateway.filter.ModifyResponseBodyGatewayFilter
-import dev.jazzybyte.lite.gateway.filter.core.GatewayFilterChain
-import dev.jazzybyte.lite.gateway.route.Route
+import dev.jazzybyte.lite.gateway.filter.GatewayFilterChain
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.server.reactive.ServerHttpRequest
 import org.springframework.http.server.reactive.ServerHttpResponse

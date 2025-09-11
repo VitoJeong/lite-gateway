@@ -1,7 +1,7 @@
 package dev.jazzybyte.lite.gateway.filter.webflux
 
-import dev.jazzybyte.lite.gateway.filter.core.GatewayContext
-import dev.jazzybyte.lite.gateway.filter.core.GatewayFilter
+import dev.jazzybyte.lite.gateway.filter.GatewayContext
+import dev.jazzybyte.lite.gateway.filter.GatewayFilter
 import io.mockk.mockk
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test

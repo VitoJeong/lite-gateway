@@ -1,4 +1,4 @@
-package dev.jazzybyte.lite.gateway.filter.core
+package dev.jazzybyte.lite.gateway.filter
 
 import org.junit.jupiter.api.Test
 import org.springframework.core.Ordered
@@ -13,10 +13,10 @@ class OrderedGatewayFilterTest {
         // Given
         val expectedOrder = 42
         val filter = TestOrderedGatewayFilter(expectedOrder)
-        
+
         // When
         val actualOrder = filter.order
-        
+
         // Then
         assertEquals(expectedOrder, actualOrder)
     }
@@ -28,10 +28,10 @@ class OrderedGatewayFilterTest {
         val filter2 = TestOrderedGatewayFilter(50)
         val filter3 = TestOrderedGatewayFilter(200)
         val filters = listOf(filter1, filter2, filter3)
-        
+
         // When
         val sortedFilters = filters.sortedBy { it.order }
-        
+
         // Then
         assertEquals(50, sortedFilters[0].order)
         assertEquals(100, sortedFilters[1].order)
@@ -43,7 +43,7 @@ class OrderedGatewayFilterTest {
         // Given
         val highestPrecedenceFilter = TestOrderedGatewayFilter(Ordered.HIGHEST_PRECEDENCE)
         val lowestPrecedenceFilter = TestOrderedGatewayFilter(Ordered.LOWEST_PRECEDENCE)
-        
+
         // Then
         assertEquals(Ordered.HIGHEST_PRECEDENCE, highestPrecedenceFilter.order)
         assertEquals(Ordered.LOWEST_PRECEDENCE, lowestPrecedenceFilter.order)
@@ -54,9 +54,9 @@ class OrderedGatewayFilterTest {
      * 테스트용 OrderedGatewayFilter 구현체
      */
     private class TestOrderedGatewayFilter(private val orderValue: Int) : OrderedGatewayFilter {
-        
+
         override fun getOrder(): Int = orderValue
-        
+
         override fun filter(context: GatewayContext, chain: GatewayFilterChain): Mono<Void> {
             return chain.filter(context)
         }

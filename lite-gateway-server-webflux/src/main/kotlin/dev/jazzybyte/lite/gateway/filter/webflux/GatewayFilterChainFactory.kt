@@ -1,8 +1,8 @@
 package dev.jazzybyte.lite.gateway.filter.webflux
 
-import dev.jazzybyte.lite.gateway.filter.core.GatewayContext
-import dev.jazzybyte.lite.gateway.filter.core.GatewayFilter
-import dev.jazzybyte.lite.gateway.filter.core.GatewayFilterChain
+import dev.jazzybyte.lite.gateway.filter.GatewayContext
+import dev.jazzybyte.lite.gateway.filter.GatewayFilter
+import dev.jazzybyte.lite.gateway.filter.GatewayFilterChain
 import reactor.core.publisher.Mono
 
 /**

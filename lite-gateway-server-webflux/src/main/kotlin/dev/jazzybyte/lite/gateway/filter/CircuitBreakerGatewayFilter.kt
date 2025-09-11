@@ -1,9 +1,6 @@
 package dev.jazzybyte.lite.gateway.filter
 
 import dev.jazzybyte.lite.gateway.context.webflux.WebFluxGatewayContext
-import dev.jazzybyte.lite.gateway.filter.core.GatewayFilter
-import dev.jazzybyte.lite.gateway.filter.core.GatewayFilterChain
-import dev.jazzybyte.lite.gateway.filter.core.GatewayContext
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.resilience4j.circuitbreaker.CircuitBreaker
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig

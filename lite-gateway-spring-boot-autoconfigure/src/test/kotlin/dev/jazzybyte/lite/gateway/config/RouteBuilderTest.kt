@@ -17,7 +17,7 @@ import org.junit.jupiter.api.assertThrows
 
 import dev.jazzybyte.lite.gateway.predicate.PredicateRegistry
 import dev.jazzybyte.lite.gateway.filter.GatewayFilterFactory
-import dev.jazzybyte.lite.gateway.filter.core.GatewayFilter
+import dev.jazzybyte.lite.gateway.filter.GatewayFilter
 
 @DisplayName("RouteBuilder 테스트")
 class RouteBuilderTest {

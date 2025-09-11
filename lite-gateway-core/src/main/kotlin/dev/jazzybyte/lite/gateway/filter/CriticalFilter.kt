@@ -1,4 +1,4 @@
-package dev.jazzybyte.lite.gateway.filter.core
+package dev.jazzybyte.lite.gateway.filter
 
 /**
  * 중요한 필터임을 나타내는 마커 인터페이스

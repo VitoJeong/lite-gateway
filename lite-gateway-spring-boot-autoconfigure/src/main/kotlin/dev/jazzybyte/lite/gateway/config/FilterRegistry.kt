@@ -1,7 +1,7 @@
 package dev.jazzybyte.lite.gateway.config
 
 import dev.jazzybyte.lite.gateway.exception.FilterDiscoveryException
-import dev.jazzybyte.lite.gateway.filter.core.GatewayFilter
+import dev.jazzybyte.lite.gateway.filter.GatewayFilter
 import dev.jazzybyte.lite.gateway.util.ReflectionUtil
 import io.github.oshai.kotlinlogging.KotlinLogging
 

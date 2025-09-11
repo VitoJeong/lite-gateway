@@ -1,7 +1,7 @@
 package dev.jazzybyte.lite.gateway.http.webflux
 
-import dev.jazzybyte.lite.gateway.filter.core.GatewayRequest
-import dev.jazzybyte.lite.gateway.filter.core.GatewayRequestBuilder
+import dev.jazzybyte.lite.gateway.filter.GatewayRequest
+import dev.jazzybyte.lite.gateway.filter.GatewayRequestBuilder
 import org.springframework.http.server.reactive.ServerHttpRequest
 
 /**

@@ -1,7 +1,6 @@
 package dev.jazzybyte.lite.gateway.filter
 
 import dev.jazzybyte.lite.gateway.context.webflux.WebFluxGatewayContext
-import dev.jazzybyte.lite.gateway.filter.core.GatewayFilterChain
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -15,7 +14,6 @@ import org.springframework.http.server.reactive.ServerHttpRequest
 import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
-import java.net.URI
 
 @DisplayName("RewritePathGatewayFilter 테스트")
 class RewritePathGatewayFilterTest {

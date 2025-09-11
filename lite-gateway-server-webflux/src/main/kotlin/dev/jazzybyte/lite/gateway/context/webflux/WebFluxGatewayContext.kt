@@ -1,9 +1,9 @@
 package dev.jazzybyte.lite.gateway.context.webflux
 
-import dev.jazzybyte.lite.gateway.filter.core.GatewayContext
-import dev.jazzybyte.lite.gateway.filter.core.GatewayContextBuilder
-import dev.jazzybyte.lite.gateway.filter.core.GatewayRequest
-import dev.jazzybyte.lite.gateway.filter.core.GatewayResponse
+import dev.jazzybyte.lite.gateway.filter.GatewayContext
+import dev.jazzybyte.lite.gateway.filter.GatewayContextBuilder
+import dev.jazzybyte.lite.gateway.filter.GatewayRequest
+import dev.jazzybyte.lite.gateway.filter.GatewayResponse
 import dev.jazzybyte.lite.gateway.http.webflux.WebFluxGatewayRequest
 import dev.jazzybyte.lite.gateway.http.webflux.WebFluxGatewayResponse
 import dev.jazzybyte.lite.gateway.route.Route

@@ -2,8 +2,8 @@ package dev.jazzybyte.lite.gateway.handler
 
 import dev.jazzybyte.lite.gateway.client.WebFluxHttpClient
 import dev.jazzybyte.lite.gateway.context.webflux.WebFluxGatewayContext
-import dev.jazzybyte.lite.gateway.filter.core.GatewayContext
-import dev.jazzybyte.lite.gateway.filter.core.GatewayFilter
+import dev.jazzybyte.lite.gateway.filter.GatewayContext
+import dev.jazzybyte.lite.gateway.filter.GatewayFilter
 import dev.jazzybyte.lite.gateway.filter.webflux.DefaultGatewayFilterChain
 import dev.jazzybyte.lite.gateway.handler.GatewayHandlerMapping.Companion.MATCHED_ROUTE_ATTRIBUTE
 import dev.jazzybyte.lite.gateway.route.Route

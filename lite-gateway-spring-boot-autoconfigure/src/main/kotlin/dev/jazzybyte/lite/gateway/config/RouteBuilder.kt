@@ -12,7 +12,6 @@ import dev.jazzybyte.lite.gateway.route.PredicateDefinition
 import dev.jazzybyte.lite.gateway.route.RouteDefinition
 import dev.jazzybyte.lite.gateway.util.ReflectionUtil
 import io.github.oshai.kotlinlogging.KotlinLogging
-import java.net.URI
 import java.util.concurrent.ConcurrentHashMap
 
 private val log = KotlinLogging.logger {}
