@@ -29,7 +29,7 @@ private val log = KotlinLogging.logger {}
  * WebFluxHttpClient HTTP 요청을 처리하기 위한 클라이언트이다.
  * WebClient를 사용하여 비동기 HTTP 요청을 처리한다.
  */
-class WebFluxHttpClient (
+class WebFluxHttpClient(
     private val maxConnections: Int,
     private val connectionTimeout: Int,
     private val maxHeaderSize: Int,
@@ -43,7 +43,7 @@ class WebFluxHttpClient (
     )
 
     constructor(
-        properties: HttpClientProperties
+        properties: HttpClientProperties,
     ) : this(
         maxConnections = properties.maxConnections,
         connectionTimeout = properties.connectionTimeout,
@@ -58,16 +58,19 @@ class WebFluxHttpClient (
          * @param properties HTTP 클라이언트 설정 속성
          * @return 생성된 WebClient 인스턴스
          */
-        fun create(maxConnections: Int,
-                   connectionTimeout: Int,
-                   maxHeaderSize: Int,
-                   acquireTimeout: Long): WebClient {
+        fun create(
+            maxConnections: Int,
+            connectionTimeout: Int,
+            maxHeaderSize: Int,
+            acquireTimeout: Long,
+        ): WebClient {
             return WebClient.builder()
                 .exchangeStrategies(
                     ExchangeStrategies.builder()
                         // 최대 16MB 메모리 버퍼 제한
-                        .codecs { config -> config.defaultCodecs()
-                            .maxInMemorySize(16 * 1024 * 1024)
+                        .codecs { config ->
+                            config.defaultCodecs()
+                                .maxInMemorySize(16 * 1024 * 1024)
                         }
                         .build())
                 .clientConnector(
@@ -76,10 +79,11 @@ class WebFluxHttpClient (
                         HttpClient.create(// ConnectionProvider로 연결 풀 설정
                             ConnectionProvider.builder("http-pool")
                                 .maxConnections(maxConnections) // 최대 연결 수 설정
-                                .pendingAcquireMaxCount(1000) // 최대 대기 연결 수
+                                .pendingAcquireMaxCount(maxConnections * 2) // 최대 대기 연결 수는 maxConnections의 2배로 설정
                                 .pendingAcquireTimeout(Duration.ofMillis(acquireTimeout))
                                 .maxIdleTime(Duration.ofSeconds(60)) // 최대 유휴 시간
-                                .build())
+                                .build()
+                        )
                             // 연결 타임아웃 설정
                             .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectionTimeout)
                             .httpResponseDecoder { spec ->
@@ -108,14 +112,17 @@ class WebFluxHttpClient (
                         log.error(ex) { "Unknown host: ${targetUri.host}" }
                         writeTextResponse(exchange, HttpStatus.BAD_GATEWAY, "Unknown host: ${targetUri.host}")
                     }
+
                     is ConnectException -> {
                         log.error(ex) { "Connection failed to: $targetUri" }
                         writeTextResponse(exchange, HttpStatus.BAD_GATEWAY, "Connection failed to: $targetUri")
                     }
+
                     is WebClientResponseException -> {
                         log.error(ex) { "Upstream error: ${ex.message}" }
                         writeTextResponse(exchange, ex.statusCode, "Upstream error: ${ex.statusText}")
                     }
+
                     else -> {
                         log.error(ex) { "Unexpected error while forwarding to: $targetUri" }
                         writeTextResponse(exchange, HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error: ${ex.message}")
@@ -130,7 +137,7 @@ class WebFluxHttpClient (
     private fun writeTextResponse(
         exchange: ServerWebExchange,
         status: HttpStatusCode,
-        message: String
+        message: String,
     ): Mono<Void> {
         val buffer = exchange.response.bufferFactory()
             .wrap(message.toByteArray(StandardCharsets.UTF_8))
