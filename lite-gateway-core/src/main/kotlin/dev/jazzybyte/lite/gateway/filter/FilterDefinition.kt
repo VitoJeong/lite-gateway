@@ -1,6 +1,7 @@
 package dev.jazzybyte.lite.gateway.filter
 
 import jakarta.validation.constraints.NotBlank
+import org.springframework.boot.context.properties.bind.ConstructorBinding
 import org.springframework.validation.annotation.Validated
 
 /**
@@ -11,7 +12,7 @@ import org.springframework.validation.annotation.Validated
  * @property order 필터의 실행 순서 (낮은 값이 먼저 실행됨, 기본값: 0).
  */
 @Validated
-data class FilterDefinition(
+data class FilterDefinition @ConstructorBinding constructor(
     @field:NotBlank(message = "Filter name cannot be blank")
     val type: String,
     // ConfigurationProperties가 바인딩할 대상

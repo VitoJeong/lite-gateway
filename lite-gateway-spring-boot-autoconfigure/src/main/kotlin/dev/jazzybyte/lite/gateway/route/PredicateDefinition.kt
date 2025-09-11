@@ -1,6 +1,7 @@
 package dev.jazzybyte.lite.gateway.route
 
 import jakarta.validation.constraints.NotBlank
+import org.springframework.boot.context.properties.bind.ConstructorBinding
 import org.springframework.validation.annotation.Validated
 
 /**
@@ -8,7 +9,7 @@ import org.springframework.validation.annotation.Validated
  * 예: Path, Method, Header 등
  */
 @Validated
-data class PredicateDefinition(
+data class PredicateDefinition @ConstructorBinding constructor(
     @field:NotBlank(message = "비어 있을 수 없습니다")
     val name: String, // TODO: 변수명 변경 type
     // ConfigurationProperties가 바인딩할 대상

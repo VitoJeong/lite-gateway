@@ -4,6 +4,7 @@ import dev.jazzybyte.lite.gateway.filter.FilterDefinition
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
+import org.springframework.boot.context.properties.bind.ConstructorBinding
 import org.springframework.validation.annotation.Validated
 import java.util.*
 
@@ -17,7 +18,7 @@ import java.util.*
  * @property order 라우트의 우선순위. 낮을수록 먼저 평가된다.
  */
 @Validated
-data class RouteDefinition(
+data class RouteDefinition @ConstructorBinding constructor(
     val id: String = UUID.randomUUID().toString(),
 
     @field:NotBlank(message = "URI는 비어 있을 수 없습니다.")

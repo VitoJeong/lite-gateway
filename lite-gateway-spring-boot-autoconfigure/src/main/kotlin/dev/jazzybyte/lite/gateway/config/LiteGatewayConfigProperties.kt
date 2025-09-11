@@ -11,25 +11,30 @@ import org.springframework.validation.annotation.Validated
 
 @Validated
 @ConfigurationProperties(prefix = PREFIX)
-class LiteGatewayConfigProperties {
-    companion object {
-        const val PREFIX = "lite.gateway"
-    }
+data class LiteGatewayConfigProperties (
 
     /**
      * 게이트웨이에 적용할 라우트 목록.
      */
     @field:NotNull
     @field:Valid
-    var routes: MutableList<RouteDefinition> = mutableListOf()
+    val routes: MutableList<RouteDefinition> = mutableListOf(),
 
     /**
      * 모든 라우트에 적용되는 필터 정의 목록.
      */
     @field:Valid
-    var globalFilters = ArrayList<FilterDefinition>()
+    val globalFilters: MutableList<FilterDefinition> = mutableListOf(),
 
-
+    /**
+     * HTTP 클라이언트 설정.
+     */
     @field:Valid
     val httpClient: HttpClientProperties = HttpClientProperties()
+
+) {
+    companion object {
+        const val PREFIX = "lite.gateway"
+    }
+
 }
